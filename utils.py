@@ -48,7 +48,7 @@ def score(df, target_name, pred_name):
     # method="first" breaks ties based on order in array
     return np.corrcoef(
         df[target_name],
-        df[[pred_name]].rank(pct=True, method="first")
+        df[pred_name].rank(pct=True, method="first")
     )[0, 1]
 
 
