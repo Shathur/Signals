@@ -3,10 +3,20 @@ import utils
 import models
 
 
-def train_val(train_df, feature_names, target_name, pred_name, cv_split_data,
+def train_val(df, feature_names, target_name, pred_name, cv_split_data,
               model_type='xgb', save_to_drive='False', save_folder='None'):
-    cv_count = 0
+    """
 
+    :param train_df:
+    :param feature_names:
+    :param target_name:
+    :param pred_name:
+    :param cv_split_data:
+    :param model_type:
+    :param save_to_drive:
+    :param save_folder:
+    :return:
+    """
     train_preds_total = []
     val_preds_total = []
 
@@ -15,8 +25,8 @@ def train_val(train_df, feature_names, target_name, pred_name, cv_split_data,
     diagnostics_per_split = []
 
     for cv_count, idx_cv in enumerate(cv_split_data):
-        train_data = train_df.iloc[idx_cv[0]]
-        val_data = train_df.iloc[idx_cv[1]]
+        train_data = df.iloc[idx_cv[0]]
+        val_data = df.iloc[idx_cv[1]]
 
         X_train = train_data[feature_names]
         y_train = train_data[target_name]
