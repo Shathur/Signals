@@ -76,7 +76,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
         val_start, val_end = utils.start_end_date(val_data)
 
         if tour_df is not None:
-            tour_preds = model.predict(tour_df.feature_names)
+            tour_preds = model.predict(tour_df[feature_names])
             # tour_preds_total.append(tour_preds)
             tour_df[pred_name] = tour_preds
             tour_era_scores = tour_df.groupby(tour_df['date']).apply(lambda x: utils.score(x, target_name, pred_name))
