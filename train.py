@@ -3,15 +3,16 @@ import utils
 import models
 
 
-def train_val(df, feature_names, target_name, pred_name, cv_split_data,
+def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=None,
               model_type='xgb', save_to_drive='False', save_folder='None'):
     """
 
-    :param train_df:
+    :param df:
     :param feature_names:
     :param target_name:
     :param pred_name:
     :param cv_split_data:
+    :param tour_df:
     :param model_type:
     :param save_to_drive:
     :param save_folder:
@@ -74,12 +75,22 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data,
         train_start, train_end = utils.start_end_date(train_data)
         val_start, val_end = utils.start_end_date(val_data)
 
+        if tour_df is not None:
+            tour_preds = model.predict(tour_df.feature_names)
+            # tour_preds_total.append(tour_preds)
+            tour_df[pred_name] = tour_preds
+            tour_era_scores = tour_df.groupby(tour_df['date']).apply(lambda x: utils.score(x, target_name, pred_name))
+            hit_tour = utils.run_analytics(tour_era_scores)
+
         dic = {'train_start': train_start,
                'train_end': train_end,
                'train_hit': hit_train,
                'val_start': val_start,
                'val_end': val_end,
                'val_hit': hit_val}
+
+        if tour_df is not None:
+            dic.update({'tour_hit': hit_tour})
 
         diagnostics_per_split.append(dic)
 
