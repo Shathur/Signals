@@ -19,7 +19,7 @@ def weeks_between_dates(d1, d2):
 
     :param d1: first date in datetime format
     :param d2: second date in datetime format
-    :return: weeks
+    :return: weeks in integer format
     """
     monday1 = (d1 - timedelta(days=d1.weekday()))
     monday2 = (d2 - timedelta(days=d2.weekday()))
