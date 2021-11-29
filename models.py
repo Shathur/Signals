@@ -31,7 +31,7 @@ def create_model(model_type='xgb'):
         model = lgb.LGBMRegressor(params=params)
 
     if model_type == 'xgb':
-        model = XGBRegressor(max_depth=5, learning_rate=0.01, n_estimators=1000, n_jobs=-1, colsample_bytree=0.6,
+        model = XGBRegressor(max_depth=4, learning_rate=0.01, n_estimators=100, n_jobs=-1, colsample_bytree=0.1,
                              tree_method='gpu_hist', verbosity=0)  # tree_method='gpu_hist',
 
     return model
