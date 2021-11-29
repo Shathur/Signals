@@ -41,10 +41,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
         train_tuple = [X_train, y_train]
         val_tuple = [X_val, y_val]
 
-        model = models.run_model(train_data=train_tuple, val_data = val_tuple, model_type=model_type,
-                                 save_to_drive=save_to_drive, save_folder = save_folder, cv_count=cv_count)
-
-        cv_count += 1
+        model = models.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
+                                 save_to_drive=save_to_drive, save_folder=save_folder, cv_count=cv_count)
 
         utils.plot_feature_importances(feature_names, model)
         feat_importances = model.feature_importances_
