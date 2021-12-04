@@ -20,6 +20,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
     """
     train_preds_total = []
     val_preds_total = []
+    tour_preds_total = []
 
     feat_importances_total = []
 
@@ -75,7 +76,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
 
         if tour_df is not None:
             tour_preds = model.predict(tour_df[feature_names])
-            # tour_preds_total.append(tour_preds)
+            tour_preds_total.append(tour_preds)
             tour_df[pred_name] = tour_preds
             tour_era_scores = tour_df.groupby(tour_df['date']).apply(lambda x: utils.score(x, target_name, pred_name))
             hit_tour = utils.run_analytics(tour_era_scores)
@@ -96,4 +97,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
     feat_importances_df = pd.DataFrame(feat_importances_total)
     diagnostics_per_split_df = pd.DataFrame(diagnostics_per_split)
 
-    return feat_importances_df, diagnostics_per_split_df
+    preds_total = [train_preds_total,
+                   val_preds_total,
+                   tour_preds_total]
+
+    return feat_importances_df, diagnostics_per_split_df, preds_total
