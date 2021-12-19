@@ -52,7 +52,7 @@ def score(df, target_name, pred_name):
     )[0, 1]
 
 
-def run_analytics(era_scores):
+def run_analytics(era_scores, plot_figures=False):
     print(f"Mean Correlation: {era_scores.mean():.4f}")
     print(f"Median Correlation: {era_scores.median():.4f}")
     print(f"Standard Deviation: {era_scores.std():.4f}")
@@ -63,10 +63,11 @@ def run_analytics(era_scores):
     hit_rate = era_scores.apply(lambda x: np.sign(x)).value_counts()[1] / len(era_scores)
     print(f'Hit Rate (% positive eras): {hit_rate:.2%}')
 
-    # era_scores.rolling(10).mean().plot(kind='line', title='Rolling Per Era Correlation Mean', figsize=(15,4))
-    # plt.axhline(y=0.0, color="r", linestyle="--"); plt.show()
+    if plot_figures:
+        era_scores.rolling(10).mean().plot(kind='line', title='Rolling Per Era Correlation Mean', figsize=(15,4))
+        plt.axhline(y=0.0, color="r", linestyle="--"); plt.show()
 
-    # era_scores.cumsum().plot(title='Cumulative Sum of Era Scores', figsize=(15,4))
-    # plt.axhline(y=0.0, color="r", linestyle="--"); plt.show()
+        era_scores.cumsum().plot(title='Cumulative Sum of Era Scores', figsize=(15,4))
+        plt.axhline(y=0.0, color="r", linestyle="--"); plt.show()
 
     return hit_rate
