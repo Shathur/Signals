@@ -59,7 +59,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         train_data[pred_name] = train_preds
         val_data[pred_name] = val_preds
 
-        # show prediction distribution, most should around the center
+        # show prediction distribution, most should be around the center
         val_data[pred_name].hist(bins=30)
 
         # spearman scores by era
