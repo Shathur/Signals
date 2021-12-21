@@ -71,8 +71,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         hit_val = utils.run_analytics(val_era_scores)
 
         # keep everything in a neat dataframe
-        train_start, train_end = utils.start_end_date(train_data)
-        val_start, val_end = utils.start_end_date(val_data)
+        train_start, train_end = utils.start_end_date(train_data, date_col)
+        val_start, val_end = utils.start_end_date(val_data, date_col)
 
         if tour_df is not None:
             tour_preds = model.predict(tour_df[feature_names])
