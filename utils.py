@@ -10,7 +10,7 @@ def start_end_date(df, date_col='date'):
     :param df: dataframe that must contain one column named 'date' in the datetime format
     :return: start date and end date as strings
     """
-    if df.date_col.dtypes == 'datetime64[ns]':
+    if df[date_col].dtypes == 'datetime64[ns]':
         start_date = str(df[date_col].iloc[0].date().month) + '-' + str(df[date_col].iloc[0].date().day) + '-' + str(
             df[date_col].iloc[0].date().year)
         end_date = str(df[date_col].iloc[-1].date().month) + '-' + str(df[date_col].iloc[-1].date().day) + '-' + str(
