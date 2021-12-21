@@ -64,7 +64,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         # spearman scores by era
         train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
-        val_era_scores = val_data.groupby(val_data[date_cdate_colol]).apply(lambda x: utils.score(x, target_name, pred_name))
+        val_era_scores = val_data.groupby(val_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
 
         # test scores, out of sample
         hit_train = utils.run_analytics(train_era_scores)
