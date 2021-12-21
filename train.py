@@ -3,8 +3,8 @@ import utils
 import models
 
 
-def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=None,
-              model_type='xgb', save_to_drive='False', save_folder='None'):
+def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
+              tour_df=None, model_type='xgb', save_to_drive='False', save_folder='None'):
     """
 
     :param df:
@@ -63,8 +63,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
         val_data[pred_name].hist(bins=30)
 
         # spearman scores by era
-        train_era_scores = train_data.groupby(train_data['date']).apply(lambda x: utils.score(x, target_name, pred_name))
-        val_era_scores = val_data.groupby(val_data['date']).apply(lambda x: utils.score(x, target_name, pred_name))
+        train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
+        val_era_scores = val_data.groupby(val_data[date_cdate_colol]).apply(lambda x: utils.score(x, target_name, pred_name))
 
         # test scores, out of sample
         hit_train = utils.run_analytics(train_era_scores)
@@ -78,7 +78,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, tour_df=
             tour_preds = model.predict(tour_df[feature_names])
             tour_preds_total.append(tour_preds)
             tour_df[pred_name] = tour_preds
-            tour_era_scores = tour_df.groupby(tour_df['date']).apply(lambda x: utils.score(x, target_name, pred_name))
+            tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
             hit_tour = utils.run_analytics(tour_era_scores)
 
         dic = {'train_start': train_start,
