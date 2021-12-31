@@ -68,12 +68,15 @@ def run_analytics(era_scores, plot_figures=False):
     print('\n')
     hit_rate = era_scores.apply(lambda x: np.sign(x)).value_counts()[1] / len(era_scores)
     print(f'Hit Rate (% positive eras): {hit_rate:.2%}')
+    print('\n')
 
     if plot_figures:
         era_scores.rolling(10).mean().plot(kind='line', title='Rolling Per Era Correlation Mean', figsize=(15,4))
-        plt.axhline(y=0.0, color="r", linestyle="--"); plt.show()
+        plt.axhline(y=0.0, color="r", linestyle="--")
+        plt.show()
 
         era_scores.cumsum().plot(title='Cumulative Sum of Era Scores', figsize=(15,4))
-        plt.axhline(y=0.0, color="r", linestyle="--"); plt.show()
+        plt.axhline(y=0.0, color="r", linestyle="--")
+        plt.show()
 
     return hit_rate
