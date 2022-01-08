@@ -7,16 +7,17 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
               tour_df=None, model_type='xgb', model_params=None, save_to_drive='False', save_folder='None'):
     """
 
-    :param df:
-    :param feature_names:
-    :param target_name:
-    :param pred_name:
-    :param cv_split_data:
-    :param tour_df:
-    :param model_type:
-    :param save_to_drive:
-    :param save_folder:
-    :return:
+    :param date_col: time column
+    :param df: your dataframe to be split and trained on
+    :param feature_names: features to be trained on
+    :param target_name: our target
+    :param pred_name: our predictions
+    :param cv_split_data: the iterator that splits our data
+    :param tour_df: the validation data we will monitor at the end
+    :param model_type: 'xgb' or 'lgb'
+    :param save_to_drive: True save False don't save
+    :param save_folder: path destination of models
+    :return: feature importances, hit rates per split, list with train, oof and validation predictions
     """
     train_preds_total = []
     val_preds_total = []
