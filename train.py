@@ -41,7 +41,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         print('********************************************************************************************')
         print("Training model on CV : {} with indices  train: {} to {}".format(cv_count, idx_cv[0][0], idx_cv[0][1]))
-        print('                                         val : {} to {}'.format(idx_cv[1][0], idx_cv[1][1]))
+        print('                                         val: {} to {}'.format(idx_cv[1][0], idx_cv[1][1]))
         print('********************************************************************************************')
 
         train_tuple = [X_train, y_train]
@@ -49,7 +49,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         model = models.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
                                  model_params=model_params, save_to_drive=save_to_drive, save_folder=save_folder,
-                                 cv_count=cv_count, visualize=0)
+                                 cv_count=cv_count)
 
         if visualize:
             utils.plot_feature_importances(feature_names, model)
