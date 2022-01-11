@@ -4,7 +4,8 @@ import models
 
 
 def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
-              tour_df=None, model_type='xgb', model_params=None, save_to_drive='False', save_folder='None'):
+              tour_df=None, model_type='xgb', model_params=None, save_to_drive='False',
+              save_folder='None', visualize=True):
     """
 
     :param date_col: time column
@@ -15,8 +16,10 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
     :param cv_split_data: the iterator that splits our data
     :param tour_df: the validation data we will monitor at the end
     :param model_type: 'xgb' or 'lgb'
+    :param model_params: custom parameters for the Regressors. If None load default
     :param save_to_drive: True save False don't save
     :param save_folder: path destination of models
+    :param visualize: boolean
     :return: feature importances, hit rates per split, list with train, oof and validation predictions
     """
     train_preds_total = []
@@ -45,9 +48,10 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         model = models.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
                                  model_params=model_params, save_to_drive=save_to_drive, save_folder=save_folder,
-                                 cv_count=cv_count)
+                                 cv_count=cv_count, visualize=0)
 
-        utils.plot_feature_importances(feature_names, model)
+        if visualize:
+            utils.plot_feature_importances(feature_names, model)
         feat_importances = model.feature_importances_
         feat_importances_dict = dict(zip(feature_names, feat_importances))
         feat_importances_total.append(feat_importances_dict)
@@ -61,8 +65,9 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         train_data[pred_name] = train_preds
         val_data[pred_name] = val_preds
 
-        # show prediction distribution, most should be around the center
-        val_data[pred_name].hist(bins=30)
+        if visualize:
+            # show prediction distribution, most should be around the center
+            val_data[pred_name].hist(bins=30)
 
         # spearman scores by era
         train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
@@ -70,7 +75,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         # test scores, out of sample
         hit_train = utils.run_analytics(train_era_scores)
-        hit_val = utils.run_analytics(val_era_scores)
+        hit_val = utils.run_analytics(val_era_scores, plot_figures=visualize)
 
         # keep everything in a neat dataframe
         train_start, train_end = utils.start_end_date(train_data, date_col)
