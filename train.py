@@ -19,7 +19,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
     :param model_params: custom parameters for the Regressors. If None load default
     :param save_to_drive: True save False don't save
     :param save_folder: path destination of models
-    :param visualize: boolean
+    :param visualize: boolean, default True
     :return: feature importances, hit rates per split, list with train, oof and validation predictions
     """
     train_preds_total = []
@@ -40,7 +40,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         y_val = val_data[target_name]
 
         print('********************************************************************************************')
-        print("Training model on CV : {} with indixes : {}".format(cv_count, idx_cv))
+        print("Training model on CV : {} with indices  train: {} to {}".format(cv_count, idx_cv[0][0], idx_cv[0][1]))
+        print('                                         val : {} to {}'.format(idx_cv[1][0], idx_cv[1][1]))
         print('********************************************************************************************')
 
         train_tuple = [X_train, y_train]
