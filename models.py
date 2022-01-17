@@ -2,14 +2,22 @@ from xgboost import XGBRegressor
 import lightgbm as lgb
 
 
-def run_model(train_data=None, val_data=None, model_type='xgb', model_params=None, save_to_drive=False,
-              save_folder=None, cv_count=None):
+def run_model(train_data=None, val_data=None, model_type='xgb', model_params=None, fit_params=None,
+              save_to_drive=False, save_folder=None, cv_count=None):
     X_train, y_train = train_data
     X_val, y_val = val_data
 
     model = create_model(model_type=model_type, model_params=model_params)
 
-    model.fit(X_train, y_train, eval_set=[(X_val, y_val)], early_stopping_rounds=10, verbose=False)
+    if fit_params is None:
+        fit_params = {
+            'early_stopping_rounds': 10,
+            'verbose': False
+        }
+    else:
+        pass
+
+    model.fit(X_train, y_train, eval_set=[(X_val, y_val)], **fit_params)
 
     if save_to_drive:
         model.save_model(save_folder + 'model_{}.'.format(cv_count)+model_type)
