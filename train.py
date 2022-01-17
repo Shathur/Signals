@@ -66,9 +66,9 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         train_data[pred_name] = train_preds
         val_data[pred_name] = val_preds
 
-        if visualize:
-            # show prediction distribution, most should be around the center
-            val_data[pred_name].hist(bins=30)
+        # if visualize:
+        #     # show prediction distribution, most should be around the center
+        #     val_data[pred_name].hist(bins=30)
 
         # spearman scores by era
         train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
