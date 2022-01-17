@@ -32,7 +32,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
     for cv_count, idx_cv in enumerate(cv_split_data):
         train_data = df.iloc[idx_cv[0]]
-        val_data = df.iloc[idx_cv[-1]]
+        val_data = df.iloc[idx_cv[1]]
 
         X_train = train_data[feature_names]
         y_train = train_data[target_name]
@@ -40,8 +40,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         y_val = val_data[target_name]
 
         print('********************************************************************************************')
-        print("Training model on CV : {} with indices  train: {} to {}".format(cv_count, idx_cv[0][0], idx_cv[0][1]))
-        print('                                         val: {} to {}'.format(idx_cv[1][0], idx_cv[1][1]))
+        print("Training model on CV : {} with indices  train: {} to {}".format(cv_count, idx_cv[0][0], idx_cv[0][-1]))
+        print('                                         val: {} to {}'.format(idx_cv[1][0], idx_cv[1][-1]))
         print('********************************************************************************************')
 
         train_tuple = [X_train, y_train]
