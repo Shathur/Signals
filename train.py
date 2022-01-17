@@ -4,8 +4,8 @@ import models
 
 
 def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
-              tour_df=None, model_type='xgb', model_params=None, save_to_drive='False',
-              save_folder='None', visualize=True):
+              tour_df=None, model_type='xgb', model_params=None, fit_params=None,
+              save_to_drive='False', save_folder='None', visualize=True):
     """
 
     :param date_col: time column
@@ -48,8 +48,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         val_tuple = [X_val, y_val]
 
         model = models.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
-                                 model_params=model_params, save_to_drive=save_to_drive, save_folder=save_folder,
-                                 cv_count=cv_count)
+                                 model_params=model_params, fit_params=fit_params, save_to_drive=save_to_drive,
+                                 save_folder=save_folder, cv_count=cv_count)
 
         if visualize:
             utils.plot_feature_importances(feature_names, model)
