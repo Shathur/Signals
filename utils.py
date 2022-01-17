@@ -1,3 +1,4 @@
+import pandas as pd
 import numpy as np
 from datetime import timedelta
 import matplotlib.pyplot as plt
@@ -59,16 +60,18 @@ def score(df, target_name, pred_name):
 
 
 def run_analytics(era_scores, plot_figures=False):
-    print(f"Mean Correlation: {era_scores.mean():.4f}")
-    print(f"Median Correlation: {era_scores.median():.4f}")
-    print(f"Standard Deviation: {era_scores.std():.4f}")
-    print('\n')
-    print(f"Mean Pseudo-Sharpe: {era_scores.mean() / era_scores.std():.4f}")
-    print(f"Median Pseudo-Sharpe: {era_scores.median() / era_scores.std():.4f}")
-    print('\n')
+    if plot_figures:
+        print(f"Mean Correlation: {era_scores.mean():.4f}")
+        print(f"Median Correlation: {era_scores.median():.4f}")
+        print(f"Standard Deviation: {era_scores.std():.4f}")
+        print('\n')
+        print(f"Mean Pseudo-Sharpe: {era_scores.mean() / era_scores.std():.4f}")
+        print(f"Median Pseudo-Sharpe: {era_scores.median() / era_scores.std():.4f}")
+        print('\n')
     hit_rate = era_scores.apply(lambda x: np.sign(x)).value_counts()[1] / len(era_scores)
-    print(f'Hit Rate (% positive eras): {hit_rate:.2%}')
-    print('\n')
+    if plot_figures:
+        print(f'Hit Rate (% positive eras): {hit_rate:.2%}')
+        print('\n')
 
     if plot_figures:
         era_scores.rolling(10).mean().plot(kind='line', title='Rolling Per Era Correlation Mean', figsize=(15,4))
