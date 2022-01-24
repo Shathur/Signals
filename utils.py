@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from datetime import timedelta
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 def start_end_date(df, date_col='date'):
@@ -83,3 +84,23 @@ def run_analytics(era_scores, plot_figures=False):
         plt.show()
 
     return hit_rate
+
+
+def features_targets_correlations(df, feature_cols, time_col, target, visualize=False):
+    # calculate correlations between targets and features
+    feature_corrs = (df.groupby(time_col).apply(lambda x: x[feature_cols].corrwith(x[target])))
+    average_feature_corrs = feature_corrs.mean()
+    average_feature_corrs_df = pd.DataFrame(average_feature_corrs, columns=['avg'])
+    average_feature_corrs_df.sort_values(inplace=True, ascending=False, by='avg')
+
+    if visualize:
+        fig, ax = plt.subplots(1, 1, figsize=(20, 10))
+        plt.xticks(rotation=90)
+        sns.barplot(
+            x='index',
+            y='avg',
+            data=average_feature_corrs_df.reset_index(),
+            ax=ax
+        )
+
+    return average_feature_corrs_df
