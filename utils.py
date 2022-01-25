@@ -72,7 +72,7 @@ def run_analytics(era_scores, plot_figures=False):
     try:
         hit_rate = era_scores.apply(lambda x: np.sign(x)).value_counts()[1] / len(era_scores)
     except Exception as e:
-        print('There should be at least 3 unique validation date_col')
+        print('Exception_Error: there should be at least 3 unique validation date_col')
 
     if plot_figures:
         print(f'Hit Rate (% positive eras): {hit_rate:.2%}')
