@@ -1,13 +1,13 @@
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor, XGBClassifier
 import lightgbm as lgb
 
 
-def run_model(train_data=None, val_data=None, model_type='xgb', model_params=None, fit_params=None,
-              save_to_drive=False, save_folder=None, cv_count=None):
+def run_model(train_data=None, val_data=None, model_type='xgb', task_type='regression', model_params=None,
+              fit_params=None, save_to_drive=False, save_folder=None, cv_count=None):
     X_train, y_train = train_data
     X_val, y_val = val_data
 
-    model = create_model(model_type=model_type, model_params=model_params)
+    model = create_model(model_type=model_type, task_type=task_type, model_params=model_params)
 
     if fit_params is None:
         fit_params = {
@@ -27,7 +27,7 @@ def run_model(train_data=None, val_data=None, model_type='xgb', model_params=Non
     return model
 
 
-def create_model(model_type='xgb', model_params=None):
+def create_model(model_type='xgb', task_type='regression', model_params=None):
     if model_params is None:
         model_params = get_default_params(model_type=model_type)
     else:
@@ -38,6 +38,10 @@ def create_model(model_type='xgb', model_params=None):
 
     if model_type == 'xgb':
         model = XGBRegressor()
+        model.set_params(**model_params)
+
+    if task_type == 'classification':
+        model = XGBClassifier()
         model.set_params(**model_params)
 
     return model
