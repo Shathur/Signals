@@ -5,7 +5,7 @@ import models
 
 def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
               tour_df=None, model_type='xgb', model_params=None, fit_params=None,
-              save_to_drive='False', save_folder='None', visualize=True):
+              save_to_drive='False', legacy_save=True, save_folder='None', visualize=True):
     """
 
     :param date_col: time column
@@ -18,6 +18,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
     :param model_type: 'xgb' or 'lgb'
     :param model_params: custom parameters for the Regressors. If None load default
     :param save_to_drive: True save False don't save
+    :param legacy_save: True save with binary format, False save json, default True
     :param save_folder: path destination of models
     :param visualize: boolean, default True
     :return: feature importances, hit rates per split, list with train, oof and validation predictions
@@ -49,7 +50,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         model = models.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
                                  model_params=model_params, fit_params=fit_params, save_to_drive=save_to_drive,
-                                 save_folder=save_folder, cv_count=cv_count)
+                                 legacy_save=legacy_save, save_folder=save_folder, cv_count=cv_count)
 
         if visualize:
             utils.plot_feature_importances(feature_names, model)
