@@ -3,7 +3,7 @@ import lightgbm as lgb
 
 
 def run_model(train_data=None, val_data=None, model_type='xgb', task_type='regression', model_params=None,
-              fit_params=None, save_to_drive=False, save_folder=None, cv_count=None):
+              fit_params=None, save_to_drive=False, save_folder=None, legacy_save=True, cv_count=None):
     X_train, y_train = train_data
     X_val, y_val = val_data
 
@@ -20,9 +20,15 @@ def run_model(train_data=None, val_data=None, model_type='xgb', task_type='regre
     model.fit(X_train, y_train, eval_set=[(X_val, y_val)], **fit_params)
 
     if save_to_drive:
-        model.save_model(save_folder + 'model_{}.'.format(cv_count)+model_type)
+        if legacy_save:
+            model.save_model(save_folder + 'model_{}.'.format(cv_count)+model_type)
+        else:
+            model.save_model(save_folder + 'model_{}.json'.format(cv_count))
     else:
-        model.save_model('model_{}.'.format(cv_count)+model_type)
+        if legacy_save:
+            model.save_model('model_{}.'.format(cv_count)+model_type)
+        else:
+            model.save_model('model_{}.json'.format(cv_count))
 
     return model
 
