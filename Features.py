@@ -52,7 +52,11 @@ class Features:
         self.added_features = list(set(self.df.columns) - set(self.initial_features))
         self.quantile_features = [f for f in self.df.columns if f.endswith('quantile')]
 
-    def int_transform(self):
+    def int_transform(self, features_lst=None):
         # save data as int8 to save space before the great chunk of added features
-        data_types = {col: 'int8' for col in self.quantile_features}
-        self.df = self.df.astype(data_types)
+        if features_lst is None:
+            data_types = {col: 'int8' for col in self.quantile_features}
+            self.df = self.df.astype(data_types)
+        else:
+            data_types = {col: 'int8' for col in features_lst}
+            self.df = self.df.astype(data_types)
