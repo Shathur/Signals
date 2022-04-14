@@ -8,6 +8,8 @@ class Features:
     def __init__(self, df, close='close'):
         self.df = df
         self.close = close
+        self.initial_features = df.columns
+        self.added_features = None
 
     def add_indicator(self, indicator, spesific_indicators=None, **extra_params):
         indicator_function = talib.abstract.Function(indicator, **extra_params)
@@ -23,6 +25,8 @@ class Features:
                 for out_cnt, out in enumerate(out_keys):
                     if out in spesific_indicators:
                         self.df[out] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x, **extra_params)[out_cnt])
+        # update list of available features
+        self.added_features = list(set(self.df.columns) - set(self.initial_features))
 
     def get_extra_indicators(self, indicator_lst):
         for indicator in tqdm(indicator_lst):
@@ -34,3 +38,5 @@ class Features:
             else:
                 for out_cnt, out in enumerate(out_keys):
                     self.df[out] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x)[out_cnt])
+        # update list of available features
+        self.added_features = list(set(self.df.columns) - set(self.initial_features))
