@@ -31,6 +31,6 @@ class Features:
             out_keys = indicator_function.__dict__['_Function__outputs'].keys()
             if output_length == 1:
                 self.df[indicator] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x))
-            # else:
+            else:
                 for out_cnt, out in enumerate(out_keys):
                     self.df[out] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x)[out_cnt])
