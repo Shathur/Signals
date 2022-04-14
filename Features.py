@@ -40,3 +40,10 @@ class Features:
                     self.df[out] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x)[out_cnt])
         # update list of available features
         self.added_features = list(set(self.df.columns) - set(self.initial_features))
+
+    def get_quantiles(self):
+        # keep the quantiles of our indicators
+        for indicator in self.added_features:
+            self.df[indicator + '_quantile'] = self.df.groupby('friday_date')[indicator].transform(
+                lambda x: pd.qcut(x=x, q=[0, 0.25, 0.5, 0.75, 1], labels=False, duplicates='drop')
+            )
