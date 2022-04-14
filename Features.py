@@ -10,6 +10,7 @@ class Features:
         self.close = close
         self.initial_features = df.columns
         self.added_features = None
+        self.quantile_features = None
 
     def add_indicator(self, indicator, spesific_indicators=None, **extra_params):
         indicator_function = talib.abstract.Function(indicator, **extra_params)
@@ -47,3 +48,11 @@ class Features:
             self.df[indicator + '_quantile'] = self.df.groupby('friday_date')[indicator].transform(
                 lambda x: pd.qcut(x=x, q=[0, 0.25, 0.5, 0.75, 1], labels=False, duplicates='drop')
             )
+        # update list of available features
+        self.added_features = list(set(self.df.columns) - set(self.initial_features))
+        self.quantile_features = [f for f in self.df.columns if f.endswith('quantile')]
+
+    def int_transform(self):
+        # save data as int8 to save space before the great chunk of added features
+        data_types = {col: 'int8' for col in self.quantile_features}
+        self.df = self.df.astype(data_types)
