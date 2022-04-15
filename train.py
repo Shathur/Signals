@@ -1,6 +1,17 @@
 import pandas as pd
+import numpy as np
 import utils
 import models
+from cross_validation import cv_split_creator
+import os
+import shutil
+from datetime import datetime
+from dateutil.relativedelta import relativedelta, FR
+import numerapi
+import gc
+
+from Numerai import get_predictions
+
 
 
 def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
@@ -112,11 +123,12 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
     return feat_importances_df, diagnostics_per_split_df, preds_total
 
-def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name=TARGET_NAME, pred_name=PREDICTION_NAME,
+
+def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name='target', pred_name='prediction',
              n_splits=4,
              submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
              model_name_reverse=None,
-             models_save_folder='/content/mymodels/', upload_name='signal_upload'):
+             models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
     # # preprocess data
     # prices_df, train_df, feature_names = prepare_dataset(data_dir, features_start)
 
@@ -143,8 +155,8 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     metrics = train_val(df=train_df,
                         date_col='friday_date',
                         feature_names=feature_names,
-                        target_name=TARGET_NAME,
-                        pred_name=PREDICTION_NAME,
+                        target_name=target_name,
+                        pred_name=pred_name,
                         cv_split_data=cv_split_data,
                         tour_df=tour_data,
 
@@ -187,14 +199,41 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     sub = sub[['ticker', 'friday_date', 'data_type', 'signal']]
 
     # submit
-    submit_signal(sub, public_id, secret_key, submit, submit_diagnostics, model_name, upload_name=upload_name)
+    submit_signal(sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit, submit_diagnostics, model_name, upload_name=upload_name)
 
     # submit reverse
     reverse_sub = sub
     reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
     reverse_sub.reset_index(drop=True, inplace=True)
-    submit_signal(reverse_sub, public_id, secret_key, submit_reverse, submit_diagnostics_reverse, model_name_reverse,
+    submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
                   upload_name)
 
     # free memory
     gc.collect()
+
+
+def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bool, submit_diagnostics: bool,
+                  slot_name: str, upload_name: str):
+    """
+    submit numerai signals prediction
+    """
+    # setup private API
+    napi = numerapi.SignalsAPI(public_id, secret_key)
+    model_id = napi.get_models()[f'{slot_name}']
+
+    if submit_diagnostics:
+        # submit to get diagnostics
+        filename = f"{upload_name}.csv"
+        sub.query('data_type == "validation"').to_csv(filename, index=False)
+        napi.upload_diagnostics(filename, model_id=model_id)
+        print('Validation prediction uploaded for diagnostics!')
+
+    # submit
+    if submit:
+        filename = f"{upload_name}.csv"
+        sub.to_csv(filename, index=False)
+        try:
+            napi.upload_predictions(filename, model_id=model_id)
+            print(f'Submitted : {slot_name}!')
+        except Exception as e:
+            print(f'Submission failure: {e}')
