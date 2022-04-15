@@ -13,6 +13,9 @@ import gc
 from Numerai import get_predictions
 
 
+def try_get_predictions():
+    a = get_predictions(model='model')
+
 
 def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
               tour_df=None, model_type='xgb', model_params=None, fit_params=None,
