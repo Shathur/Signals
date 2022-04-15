@@ -10,7 +10,7 @@ from dateutil.relativedelta import relativedelta, FR
 import numerapi
 import gc
 
-from Numerai import get_predictions
+from Numerai.predictions import get_predictions
 
 
 def try_get_predictions():
