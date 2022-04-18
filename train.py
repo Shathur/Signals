@@ -184,9 +184,6 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
 
     validation_sub['signal'] = validation_predictions
 
-    last_friday = datetime.now() + relativedelta(weekday=FR(-1))
-    last_friday = int(last_friday.strftime('%Y%m%d'))
-
     # live sub
     train_df.loc[train_df['friday_date'] == last_friday, 'data_type'] = 'live'
 
@@ -320,9 +317,6 @@ def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10,
     validation_sub = tour_data.copy()
 
     validation_sub['signal'] = validation_predictions
-
-    last_friday = datetime.now() + relativedelta(weekday=FR(-1))
-    last_friday = int(last_friday.strftime('%Y%m%d'))
 
     # live sub
     train_df.loc[train_df['friday_date'] == last_friday, 'data_type'] = 'live'
