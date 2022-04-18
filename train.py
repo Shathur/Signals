@@ -243,7 +243,7 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
             print(f'Submission failure: {e}')
 
 
-def train_CV(data_dir, feature_df, last_friday, model_name, n_splits=10, target_name='target',
+def train__combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10, target_name='target',
              pred_name='prediction',
              submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
              model_name_reverse=None,
