@@ -257,6 +257,9 @@ def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10,
     la.extend(most_imp_v2_feats)
     train_v2_imp_df = train_v2_df.loc[:, la]  # train_v2_df.columns.isin(most_imp_v2_feats),
 
+    # keep only common dates to save memory
+    feature_df = feature_df[feature_df['friday_date'].isin(train_v2_df['friday_date'].unique())]
+
     feature_df = feature_df.merge(
         train_v2_imp_df,
         how='left',
