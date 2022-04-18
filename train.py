@@ -136,7 +136,7 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     # # preprocess data
     # prices_df, train_df, feature_names = prepare_dataset(data_dir, features_start)
 
-    train_df = pd.read_parquet(data_dir)
+    train_df = pd.read_pickle(data_dir)
 
     train_without_live = train_df[train_df['friday_date'] < last_friday]
     train_without_live.dropna(inplace=True)
@@ -243,7 +243,7 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
             print(f'Submission failure: {e}')
 
 
-def train__combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10, target_name='target',
+def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10, target_name='target',
              pred_name='prediction',
              submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
              model_name_reverse=None,
