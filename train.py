@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import utils
-import models
+import model_handling
 from cross_validation import cv_split_creator
 import os
 import shutil
@@ -63,7 +63,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         train_tuple = [X_train, y_train]
         val_tuple = [X_val, y_val]
 
-        model = models.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
+        model = model_handling.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
                                  model_params=model_params, fit_params=fit_params, save_to_drive=save_to_drive,
                                  legacy_save=legacy_save, save_folder=save_folder, cv_count=cv_count)
 
