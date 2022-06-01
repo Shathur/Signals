@@ -129,3 +129,16 @@ def rescale(prediction, targets_lst, feature_range=(0.000001, 0.999999), plot=Tr
         print(np.min(prediction[t]))
 
     return prediction
+
+
+def save_obj(obj, name):
+    """
+    save and load dtypes object for reading objects(csvs, lists, models etc.)
+    """
+    with open(name + '.pkl', 'wb') as f:
+        pickle.dump(obj, f, pickle.HIGHEST_PROTOCOL)
+
+
+def load_obj(name):
+    with open(name + '.pkl', 'rb') as f:
+        return pickle.load(f)
