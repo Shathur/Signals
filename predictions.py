@@ -7,7 +7,7 @@ from tqdm.notebook import tqdm
 import os
 import gc
 
-from model_handling import get_model_lst, create_model
+from Signals.model_handling import get_model_lst, create_model
 
 
 # predict in batches to avoid memory issues
