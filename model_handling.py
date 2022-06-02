@@ -2,6 +2,16 @@ from xgboost import XGBRegressor, XGBClassifier
 import lightgbm as lgb
 
 
+# get models into a  list for iteration on them
+def get_model_lst(num_models=1, folder_name=None):
+    model_lst = []
+    for cv_num in range(num_models):
+        model_lst.append(folder_name + 'model_{}.xgb'.format(cv_num))
+    print(model_lst)
+
+    return model_lst
+
+
 def run_model(train_data=None, val_data=None, model_type='xgb', task_type='regression', model_params=None,
               fit_params=None, save_to_drive=False, save_folder=None, legacy_save=True, cv_count=None):
     X_train, y_train = train_data
