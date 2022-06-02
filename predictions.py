@@ -59,7 +59,7 @@ def get_predictions(df=None, num_models=1, prefix=None, folder_name=None, model_
         if model_type == 'lgb':
             model = lgb.Booster(model_file=model_lst[cv_num])
         if model_type == 'xgb':
-            model = bf.create_model(model_type='xgb')
+            model = create_model(model_type='xgb')
             model.load_model(model_lst[cv_num])
 
         X_test = df
