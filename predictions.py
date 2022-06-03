@@ -53,7 +53,7 @@ def get_predictions(df=None, num_models=1, prefix=None, folder_name=None, model_
     :param batch_size: predict in batch_size equal to this number
     :return: np.array with predictions for the df
     """
-    model_lst = bf.get_model_lst(num_models=num_models, prefix=prefix, folder_name=folder_name)
+    model_lst = get_model_lst(num_models=num_models, prefix=prefix, folder_name=folder_name)
     predictions_total = []
     for cv_num in range(num_models):
         if model_type == 'lgb':
