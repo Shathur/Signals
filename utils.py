@@ -4,6 +4,7 @@ from datetime import timedelta
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
+import pickle
 
 
 def start_end_date(df, date_col='date'):
