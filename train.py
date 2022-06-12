@@ -249,7 +249,7 @@ def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10,
     # prices_df, train_df, feature_names = prepare_dataset(data_dir, features_start)
 
     train_v2_df = pd.read_parquet(data_dir)
-    most_imp_v2_feats = load_obj('/content/drive/MyDrive/Colab Notebooks/Numer.ai Signals/Utils/20_imp_feats_after_CV')
+    most_imp_v2_feats = load_obj('/content/drive/MyDrive/ColabNotebooks/Numer.ai Signals/Utils/20_imp_feats_after_CV')
     la = ['ticker', 'date', 'friday_date']
     la.extend(most_imp_v2_feats)
     train_v2_imp_df = train_v2_df.loc[:, la]  # train_v2_df.columns.isin(most_imp_v2_feats),
