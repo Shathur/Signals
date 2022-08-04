@@ -1,7 +1,7 @@
 pandas
 numpy
 numerapi
-talib
+ta-lib
 xgboost
 lightgbm
 sklearn
