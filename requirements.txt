@@ -1,0 +1,11 @@
+pandas
+numpy
+numerapi
+talib
+xgboost
+lightgbm
+sklearn
+pickle
+tqdm
+matplotlib
+seaborn
