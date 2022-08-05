@@ -12,19 +12,19 @@ class Features:
         self.added_features = None
         self.quantile_features = None
 
-    def add_indicator(self, indicator, spesific_indicators=None, **extra_params):
+    def add_indicator(self, indicator, specific_indicators=None, **extra_params):
         indicator_function = talib.abstract.Function(indicator, **extra_params)
         output_length = len(indicator_function.__dict__['_Function__outputs'])
         out_keys = indicator_function.__dict__['_Function__outputs'].keys()
         if output_length == 1:
             self.df[indicator] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x, **extra_params))
         else:
-            if spesific_indicators is None:
+            if specific_indicators is None:
                 for out_cnt, out in enumerate(out_keys):
                     self.df[out] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x, **extra_params)[out_cnt])
             else:
                 for out_cnt, out in enumerate(out_keys):
-                    if out in spesific_indicators:
+                    if out in specific_indicators:
                         self.df[out] = self.df.groupby('ticker')[self.close].transform(lambda x: indicator_function(x, **extra_params)[out_cnt])
         # update list of available features
         self.added_features = list(set(self.df.columns) - set(self.initial_features))
