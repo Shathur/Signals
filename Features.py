@@ -8,7 +8,7 @@ class Features:
     def __init__(self, df, close='close'):
         self.df = df
         self.close = close
-        self.initial_features = df.columns
+        self.initial_features = df.copy().columns
         self.added_features = None
         self.quantile_features = None
 
