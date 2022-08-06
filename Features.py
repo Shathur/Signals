@@ -60,3 +60,8 @@ class Features:
         else:
             data_types = {col: 'int8' for col in features_lst}
             self.df = self.df.astype(data_types)
+
+    def remove_indicator(self, indicators_lst):
+        # remove list of indicators
+        self.df.drop(columns=indicators_lst, inplace=True)
+        self.added_features = list(set(self.added_features) - set(indicators_lst))
