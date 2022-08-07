@@ -11,7 +11,7 @@ import numerapi
 import gc
 
 from predictions import get_predictions
-from utils import load_obj, run_analytics, plot_feature_importances
+from Signals.utils import load_obj, run_analytics, plot_feature_importances
 
 
 def try_get_predictions():
