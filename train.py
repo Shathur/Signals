@@ -91,8 +91,8 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         val_era_scores = val_data.groupby(val_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
 
         # test scores, out of sample
-        hit_train = utils.run_analytics(train_era_scores)
-        hit_val = utils.run_analytics(val_era_scores, plot_figures=visualize)
+        hit_train = run_analytics(train_era_scores)
+        hit_val = run_analytics(val_era_scores, plot_figures=visualize)
 
         # keep everything in a neat dataframe
         train_start, train_end = utils.start_end_date(train_data, date_col)
@@ -103,7 +103,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
             tour_preds_total.append(tour_preds)
             tour_df[pred_name] = tour_preds
             tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
-            hit_tour = utils.run_analytics(tour_era_scores)
+            hit_tour = run_analytics(tour_era_scores)
 
         dic = {'train_start': train_start,
                'train_end': train_end,
