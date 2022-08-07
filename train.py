@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import utils
+# import utils
 import model_handling
 from cross_validation import cv_split_creator
 import os
@@ -11,7 +11,7 @@ import numerapi
 import gc
 
 from predictions import get_predictions
-from utils import load_obj
+from utils import load_obj, run_analytics, plot_feature_importances
 
 
 def try_get_predictions():
