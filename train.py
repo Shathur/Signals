@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import model_handling
 from cross_validation import cv_split_creator
 import os
 import shutil
@@ -9,7 +8,8 @@ from dateutil.relativedelta import relativedelta, FR
 import numerapi
 import gc
 
-from predictions import get_predictions
+from Signals.predictions import get_predictions
+from Signals import model_handling
 from Signals import utils
 from Signals.utils import load_obj, run_analytics, plot_feature_importances
 
