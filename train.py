@@ -129,7 +129,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
 
 def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name='target', pred_name='prediction',
-             n_splits=4,
+             n_splits=4, model_params=None, fit_params=None, model_type='xgb',
              submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
              model_name_reverse=None,
              models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
@@ -163,7 +163,9 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
                         pred_name=pred_name,
                         cv_split_data=cv_split_data,
                         tour_df=tour_data,
-
+                        model_params=model_params,
+                        fit_params=fit_params,
+                        model_type=model_type,
                         save_to_drive=True,
                         save_folder=models_save_folder,
                         visualize=True)
@@ -203,11 +205,12 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     submit_signal(sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit, submit_diagnostics, model_name, upload_name=upload_name)
 
     # submit reverse
-    reverse_sub = sub
-    reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
-    reverse_sub.reset_index(drop=True, inplace=True)
-    submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
-                  upload_name)
+    if submit_reverse:
+        reverse_sub = sub
+        reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
+        reverse_sub.reset_index(drop=True, inplace=True)
+        submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
+                      upload_name)
 
     # free memory
     gc.collect()
@@ -241,7 +244,7 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
 
 
 def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10, target_name='target',
-             pred_name='prediction',
+             pred_name='prediction', model_params=None, fit_params=None, model_type='xgb',
              submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
              model_name_reverse=None,
              models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
@@ -298,6 +301,9 @@ def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10,
                         pred_name=pred_name,
                         cv_split_data=cv_split_data,
                         tour_df=tour_data,
+                        model_params=model_params,
+                        fit_params=fit_params,
+                        model_type=model_type,
                         save_to_drive=True,
                         save_folder=models_save_folder,
                         visualize=True)
@@ -337,11 +343,12 @@ def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10,
     submit_signal(sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit, submit_diagnostics, model_name, upload_name=upload_name)
 
     # submit reverse
-    reverse_sub = sub
-    reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
-    reverse_sub.reset_index(drop=True, inplace=True)
-    submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
-                  upload_name)
+    if submit_reverse:
+        reverse_sub = sub
+        reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
+        reverse_sub.reset_index(drop=True, inplace=True)
+        submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
+                      upload_name)
 
     # free memory
     gc.collect()
