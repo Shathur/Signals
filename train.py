@@ -193,7 +193,7 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
 
     live_sub['signal'] = get_predictions(df=live_sub[feature_names],
                                          num_models=4,
-                                         folder_name='/content/mymodels/')
+                                         folder_name=models_save_folder)
 
     # concat valid and test
     sub = pd.concat([validation_sub, live_sub], ignore_index=True)
