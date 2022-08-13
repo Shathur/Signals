@@ -142,9 +142,11 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     train_without_live.dropna(inplace=True)
     train_df = pd.concat([train_without_live, train_df[train_df['friday_date'] == last_friday]])
 
-    feature_names = train_df.columns[
-                    train_df.columns.str.find(features_boundaries[0]).argmax(): train_df.columns.str.find(
-                        features_boundaries[1]).argmax() + 1].tolist()
+    # feature_names = train_df.columns[
+    #                 train_df.columns.str.find(features_boundaries[0]).argmax(): train_df.columns.str.find(
+    #                     features_boundaries[1]).argmax() + 1].tolist()
+
+    feature_names = [f for f in train_df.columns if (('quantile' in f) or ('diff' in f))]
 
     # split data
     cv_split_data = cv_split_creator(df=train_df, col='friday_date', n_splits=n_splits)
@@ -243,16 +245,16 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
             print(f'Submission failure: {e}')
 
 
-def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10, target_name='target',
-             pred_name='prediction', model_params=None, fit_params=None, model_type='xgb',
-             submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
-             model_name_reverse=None,
-             models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
+def train_combine_CV(data_dir, imp_feats, feature_df, last_friday, model_name, n_splits=10,
+                    target_name='target',pred_name='prediction', model_params=None, fit_params=None, model_type='xgb',
+                    submit=True, submit_diagnostics=False, submit_reverse=False,
+                    submit_diagnostics_reverse=False, model_name_reverse=None,
+                    models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
     # # preprocess data
     # prices_df, train_df, feature_names = prepare_dataset(data_dir, features_start)
 
     train_v2_df = pd.read_parquet(data_dir)
-    most_imp_v2_feats = load_obj('/content/drive/MyDrive/ColabNotebooks/Numer.ai Signals/Utils/20_imp_feats_after_CV')
+    most_imp_v2_feats = load_obj(imp_feats)
     la = ['ticker', 'date', 'friday_date']
     la.extend(most_imp_v2_feats)
     train_v2_imp_df = train_v2_df.loc[:, la]  # train_v2_df.columns.isin(most_imp_v2_feats),
