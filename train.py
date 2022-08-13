@@ -331,7 +331,7 @@ def train_combine_CV(data_dir, feature_df, last_friday, model_name, n_splits=10,
 
     live_sub['signal'] = get_predictions(df=live_sub[feature_names],
                                          num_models=4,
-                                         folder_name='/content/mymodels/')
+                                         folder_name=models_save_folder)
 
     # concat valid and test
     sub = pd.concat([validation_sub, live_sub], ignore_index=True)
