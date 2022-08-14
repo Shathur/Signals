@@ -146,7 +146,8 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     #                 train_df.columns.str.find(features_boundaries[0]).argmax(): train_df.columns.str.find(
     #                     features_boundaries[1]).argmax() + 1].tolist()
 
-    feature_names = [f for f in train_df.columns if (('quantile' in f) or ('diff' in f))]
+    drops = ['data_type', 'target_4d', 'target_20d', 'friday_date', 'ticker', 'bloomberg_ticker']
+    feature_names = [f for f in feature_df.columns.values.tolist() if f not in drops]
 
     # split data
     cv_split_data = cv_split_creator(df=train_df, col='friday_date', n_splits=n_splits)
