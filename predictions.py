@@ -6,6 +6,7 @@ import pickle
 from tqdm.notebook import tqdm
 import os
 import gc
+import joblib
 
 from Signals.model_handling import get_model_lst, create_model
 
@@ -61,6 +62,8 @@ def get_predictions(df=None, num_models=1, prefix=None, folder_name=None, model_
         if model_type == 'xgb':
             model = create_model(model_type='xgb')
             model.load_model(model_lst[cv_num])
+        if model_type == 'joblib':
+            model = joblib.load(filename=model_lst[cv_num])
 
         X_test = df
 
@@ -99,6 +102,8 @@ def get_predictions_per_era(df=None, num_models=1, prefix=None, folder_name=None
         if model_type == 'xgb':
             model = create_model(model_type='xgb')
             model.load_model(model_lst[cv_num])
+        if model_type == 'joblib':
+            model = joblib.load(filename=model_lst[cv_num])
 
         predictions = predict_in_era_batch(model=model,
                                            df=X_test,
