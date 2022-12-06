@@ -146,7 +146,7 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
     #                 train_df.columns.str.find(features_boundaries[0]).argmax(): train_df.columns.str.find(
     #                     features_boundaries[1]).argmax() + 1].tolist()
 
-    #drops = ['data_type', 'target_4d', 'target_20d', 'friday_date', 'ticker', 'bloomberg_ticker']
+    # drops = ['data_type', 'target_4d', 'target_20d', 'friday_date', 'ticker', 'bloomberg_ticker']
     targets_columns = [t for t in train_df.columns.tolist() if t.starts_with_target]
     standard_columns = ['data_type', 'friday_date', 'ticker', 'bloomberg_ticker']
     drops = standard_columns + targets_columns
