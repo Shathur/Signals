@@ -1,6 +1,8 @@
+A
 import pandas as pd
 import numpy as np
-from datetime import timedelta
+from datetime import datetime, timedelta
+from datetutil.relativedelta import relativedelta, TH, FR
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
@@ -143,3 +145,18 @@ def save_obj(obj, name):
 def load_obj(name):
     with open(name + '.pkl', 'rb') as f:
         return pickle.load(f)
+
+def check_enough_tickers(train_df):
+    # check if for some reason last friday is missing and use another date instead
+    last_friday = datetime.now() + relativedelta(weekday=FR(-1))
+    last_friday = int(last_friday.strftime('%Y%m%d'))
+
+    if len(train_df[train_df['friday_date']==last_friday])<1000:
+        last_friday_num_tickers = len(train_df[train_df['friday_date']==last_friday])
+        print(f'Last Friday had {last_friday_num_tickers} tickers')
+        last_friday = datetime.now() + relativedelta(weekday=TH(-1))
+        last_friday = int(last_friday.strftime('%Y%m%d'))
+        print(f'We will be using last Thursday instead {last_friday}')
+    else:
+        print(len(train_df[train_df['friday_date']==last_friday]))
+    return last_friday
