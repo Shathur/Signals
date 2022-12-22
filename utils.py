@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
-from datetutil.relativedelta import relativedelta, TH, FR
+from dateutil.relativedelta import relativedelta, TH, FR
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import MinMaxScaler
