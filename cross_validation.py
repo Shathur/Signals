@@ -67,6 +67,8 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
     def __init__(self, n_splits=None, embg_grp_num=None):
         if n_splits>1:
             super().__init__(n_splits,shuffle=False, random_state=None)
+        else:
+            self.n_splits = n_splits
         self.embg_grp_num = embg_grp_num
 
     def split(self, X, y=None, groups=None):
