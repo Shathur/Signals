@@ -159,3 +159,14 @@ def check_enough_tickers(train_df):
     else:
         print(len(train_df[train_df['friday_date']==last_friday]))
     return last_friday
+
+def check_if_live(
+    sub,
+    date_col
+):
+    print(f'Today: {int(datetime.now().strftime("%Y%m%d"))}')
+    dates_lst = sub[date_col].unique()
+    dates_lst.sort()
+    print(f'Last available day {dates_lst[-1]}')
+    sub.loc[sub[date_col]==dates_lst[-1],'data_type'] = 'live'
+    return sub
