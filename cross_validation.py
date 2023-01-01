@@ -89,13 +89,13 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
         test_starts = range(test_size + n_groups % n_folds,
                             n_groups, test_size)
         test_starts = list(test_starts)[::-1]
-        if n_splits<1:
-            yield (indices[groups.isin(group_list[:int(0.8*len(group_list))-embg_grp_num])],
-                    indices[groups.isin(group_list[int(0.8*len(group_list))-embg_grp_num:])])
-        else:
+        if n_splits>1:
             for test_start in test_starts:
                 yield (indices[groups.isin(group_list[:test_start-embg_grp_num])],
                        indices[groups.isin(group_list[test_start+embg_grp_num : test_start+embg_grp_num + test_size])])
+        else:
+            yield (indices[groups.isin(group_list[:int(0.8*len(group_list))-embg_grp_num])],
+                    indices[groups.isin(group_list[int(0.8*len(group_list))-embg_grp_num:])])
 
 
 class PurgedKfold(_BaseKFold):
