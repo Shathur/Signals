@@ -65,7 +65,8 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
     """
 
     def __init__(self, n_splits=None, embg_grp_num=None):
-        super().__init__(n_splits,shuffle=False, random_state=None)
+        if n_splits>1:
+            super().__init__(n_splits,shuffle=False, random_state=None)
         self.embg_grp_num = embg_grp_num
 
     def split(self, X, y=None, groups=None):
@@ -78,7 +79,7 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
         n_groups = len(group_list)
         if n_folds > n_groups:
             raise ValueError(
-                ("Cannot have number of folds ={0} greater"
+                ("Cannot have number of folds : {0} greater"
                  " than the number of samples: {1}.").format(n_folds,
                                                              n_groups))
         indices = np.arange(n_samples)
@@ -86,9 +87,13 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
         test_starts = range(test_size + n_groups % n_folds,
                             n_groups, test_size)
         test_starts = list(test_starts)[::-1]
-        for test_start in test_starts:
-            yield (indices[groups.isin(group_list[:test_start-embg_grp_num])],
-                   indices[groups.isin(group_list[test_start+embg_grp_num : test_start+embg_grp_num + test_size])])
+        if n_splits<1:
+            yield (indices[groups.isin(group_list[:int(0.8*len(group_list))-embg_grp_num])],
+                    indices[groups.isin(group_list[int(0.8*len(group_list))-embg_grp_num:])])
+        else:
+            for test_start in test_starts:
+                yield (indices[groups.isin(group_list[:test_start-embg_grp_num])],
+                       indices[groups.isin(group_list[test_start+embg_grp_num : test_start+embg_grp_num + test_size])])
 
 
 class PurgedKfold(_BaseKFold):
