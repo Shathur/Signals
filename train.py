@@ -223,30 +223,42 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
 
 
 def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bool, submit_diagnostics: bool,
-                  slot_name: str, upload_name: str):
+                  slot_name: str, upload_name: str, predictions_folder='default', delete_after_upload=False,):
     """
     submit numerai signals prediction
+    predictions folder: when 'default' save in the same folder of the module
+    delete_after_upload: defaults to False
     """
     # setup private API
     napi = numerapi.SignalsAPI(public_id, secret_key)
     model_id = napi.get_models()[f'{slot_name}']
-
+    # get file path
+    if predictions_folder == 'default':
+        filename = f"{upload_name}.csv"
+    else:
+        filename = os.path.abspath(os.path.join(os.path.dirname(__file__),predictions_folder,f"{upload_name}.csv"))
+    # submit_diagnostics
     if submit_diagnostics:
         # submit to get diagnostics
-        filename = f"{upload_name}.csv"
+        # filename = f"{upload_name}.csv"
         sub.query('data_type == "validation"').to_csv(filename, index=False)
         napi.upload_diagnostics(filename, model_id=model_id)
         print('Validation prediction uploaded for diagnostics!')
-
     # submit
     if submit:
-        filename = f"{upload_name}.csv"
+        # filename = f"{upload_name}.csv"
         sub.to_csv(filename, index=False)
         try:
             napi.upload_predictions(filename, model_id=model_id)
             print(f'Submitted : {slot_name}!')
         except Exception as e:
             print(f'Submission failure: {e}')
+    # try to remove file to avoid clutter
+    try:
+        if delete_after_upload==True:
+            os.remove(filename)        
+    except Exception as e:
+        print(f'No file found for removal: {e}')
 
 
 def train_combine_CV(data_dir, imp_feats, feature_df, last_friday, model_name, n_splits=10,
