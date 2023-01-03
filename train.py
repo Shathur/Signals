@@ -237,6 +237,8 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
         filename = f"{upload_name}.csv"
     else:
         filename = os.path.abspath(os.path.join(os.path.dirname(__file__),predictions_folder,f"{upload_name}.csv"))
+    # filename = f"{upload_name}.csv"
+    sub.to_csv(filename, index=False)
     # submit_diagnostics
     if submit_diagnostics:
         # submit to get diagnostics
@@ -246,8 +248,6 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
         print('Validation prediction uploaded for diagnostics!')
     # submit
     if submit:
-        # filename = f"{upload_name}.csv"
-        sub.to_csv(filename, index=False)
         try:
             napi.upload_predictions(filename, model_id=model_id)
             print(f'Submitted : {slot_name}!')
