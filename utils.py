@@ -145,19 +145,23 @@ def load_obj(name):
     with open(name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
-def check_enough_tickers(train_df):
+def check_enough_tickers(df, use_last_available=False, date_col='friday_date'):
     # check if for some reason last friday is missing and use another date instead
     last_friday = datetime.now() + relativedelta(weekday=FR(-1))
     last_friday = int(last_friday.strftime('%Y%m%d'))
 
-    if len(train_df[train_df['friday_date']==last_friday])<1000:
-        last_friday_num_tickers = len(train_df[train_df['friday_date']==last_friday])
+    if len(df[df[date_col]==last_friday])<1000:
+        last_friday_num_tickers = len(df[df[date_col]==last_friday])
         print(f'Last Friday had {last_friday_num_tickers} tickers')
         last_friday = datetime.now() + relativedelta(weekday=TH(-1))
         last_friday = int(last_friday.strftime('%Y%m%d'))
         print(f'We will be using last Thursday instead {last_friday}')
     else:
-        print(len(train_df[train_df['friday_date']==last_friday]))
+        print(f'last friday with enough tickers: {len(df[df[date_col]==last_friday])}')
+    if use_last_available:
+        dates_lst = df[date_col].unique().tolist()
+        last_friday = dates_lst[-1]
+        print(f'We are using the last available date: {last_friday}')
     return last_friday
 
 def check_if_live(
