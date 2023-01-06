@@ -98,7 +98,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         train_start, train_end = utils.start_end_date(train_data, date_col)
         val_start, val_end = utils.start_end_date(val_data, date_col)
 
-        if ((tour_df is not None) and (~tour_df.empty)):
+        if ((tour_df is not None) and (not tour_df.empty)):
             tour_preds = model.predict(tour_df[feature_names])
             tour_preds_total.append(tour_preds)
             tour_df[pred_name] = tour_preds
@@ -112,7 +112,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
                'val_end': val_end,
                'val_hit': hit_val}
 
-        if tour_df is not None:
+        if ((tour_df is not None) and (not tour_df.empty)):
             dic.update({'tour_hit': hit_tour})
 
         diagnostics_per_split.append(dic)
