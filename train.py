@@ -32,6 +32,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
     :param tour_df: the validation data we will monitor at the end
     :param model_type: 'xgb' or 'lgb'
     :param model_params: custom parameters for the Regressors. If None load default
+    :param fit_params: custom parameters for the fit fuction of our Regressors. If None load default
     :param save_to_drive: True save False don't save
     :param legacy_save: True save with binary format, False save json, default True
     :param save_folder: path destination of models
