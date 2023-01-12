@@ -71,7 +71,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         if visualize:
             utils.plot_feature_importances(feature_names, model)
         if model_type=='lgb':
-            feat_importances = model.feature_importance
+            feat_importances = model.feature_importance(importance_type='gain')
         else:
             feat_importances = model.feature_importances_
         feat_importances_dict = dict(zip(feature_names, feat_importances))
