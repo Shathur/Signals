@@ -70,7 +70,10 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         if visualize:
             utils.plot_feature_importances(feature_names, model)
-        feat_importances = model.feature_importances_
+        if model_type=='lgb':
+            feat_importances = model.feature_importance
+        else:
+            feat_importances = model.feature_importances_
         feat_importances_dict = dict(zip(feature_names, feat_importances))
         feat_importances_total.append(feat_importances_dict)
 
