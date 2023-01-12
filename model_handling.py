@@ -1,6 +1,7 @@
 from xgboost import XGBRegressor, XGBClassifier
 import lightgbm as lgb
 import os
+import json
 
 
 # get models into a list for iteration on them
@@ -45,16 +46,29 @@ def run_model(train_data=None, val_data=None, model_type='xgb', task_type='regre
 
     model.fit(X_train, y_train, eval_set=[(X_val, y_val)], **fit_params)
 
+    # if we are using lgb we first need to keep the booster of our model
+    if model_type == 'lgb':
+        model = model.booster_
+
     if save_to_drive:
         if legacy_save:
-            model.save_model(save_folder + 'model_{}.'.format(cv_count)+model_type)
+            if model_type=='lgb':
+                model.save_model(os.path.join(save_folder,f'model_{cv_count}.{model_type}'))
+            else:
+                model.save_model(save_folder + 'model_{}.'.format(cv_count)+model_type)
         else:
-            model.save_model(save_folder + 'model_{}.json'.format(cv_count))
-    else:
-        if legacy_save:
-            model.save_model('model_{}.'.format(cv_count)+model_type)
-        else:
-            model.save_model('model_{}.json'.format(cv_count))
+            if model_type=='lgb':
+                model_json = model.dump_model()
+                with open(os.path.join(save_folder,f'model_{cv_count}.{model_type}'),'w') as f:
+                    json.dump(model_json, f)
+                model.save_model(os.path.join(save_folder,f'model_{cv_count}.{model_type}'))
+            else:
+                model.save_model(save_folder + 'model_{}.json'.format(cv_count))
+     # else:
+     #     if legacy_save:
+     #         model.save_model('model_{}.'.format(cv_count)+model_type)
+     #     else:
+     #         model.save_model('model_{}.json'.format(cv_count))
 
     return model
 
