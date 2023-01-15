@@ -94,9 +94,6 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
                 yield (indices[groups.isin(group_list[:test_start-embg_grp_num])],
                        indices[groups.isin(group_list[test_start+embg_grp_num : test_start+embg_grp_num + test_size])])
         else:
-            print(f'group_list: {group_list}')
-            print(f'len 0.8: {int(0.8*len(group_list))}')
-            print(f'embg_grp_num: {embg_grp_num}')
             yield (indices[groups.isin(group_list[:int(0.8*len(group_list))-embg_grp_num])],
                     indices[groups.isin(group_list[int(0.8*len(group_list))+embg_grp_num:])])
 
