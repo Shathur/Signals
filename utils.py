@@ -160,6 +160,7 @@ def check_enough_tickers(df, use_last_available=False, date_col='friday_date'):
         print(f'last friday with enough tickers: {len(df[df[date_col]==last_friday])}')
     if use_last_available:
         dates_lst = df[date_col].unique().tolist()
+        dates_lst.sort()
         last_friday = dates_lst[-1]
         print(f'We are using the last available date: {last_friday}')
     return last_friday
