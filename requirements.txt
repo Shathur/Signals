@@ -4,7 +4,7 @@ numerapi
 ta-lib
 xgboost
 lightgbm
-sklearn
+scikit-learn
 tqdm
 matplotlib
 seaborn
