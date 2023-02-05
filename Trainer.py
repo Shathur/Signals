@@ -7,11 +7,11 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta, FR
 import pickle
 import gc
-from cross_validation import cv_split_creator, TimeSeriesSplitGroups, TimeSeriesSplitGroupsPurged, RandomSplits, WindowedGroups
-from utils import check_enough_tickers, start_end_date, check_if_live
-from train import train_val, submit_signal
-from predictions import get_predictions
-from setup_env_variables import setup
+from Signals.cross_validation import cv_split_creator, TimeSeriesSplitGroups, TimeSeriesSplitGroupsPurged, RandomSplits, WindowedGroups
+from Signals.utils import check_enough_tickers, start_end_date, check_if_live
+from Signals.train import train_val, submit_signal
+from Signals.predictions import get_predictions
+from Signals.setup_env_variables import setup
 
 class CV_scheme():
     RandomSplits = RandomSplits
