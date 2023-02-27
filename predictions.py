@@ -7,6 +7,7 @@ from tqdm.notebook import tqdm
 import os
 import gc
 import joblib
+from concurrent.futures import ThreadPoolExecutor
 
 from Signals.model_handling import get_model_lst, create_model
 
@@ -273,3 +274,60 @@ def get_predictions_per_era_joblib(df, preds_cache_file=None, num_models=1, pref
     gc.collect()
 
     return predictions_final.squeeze()
+
+
+def single_predict(
+    df=None,
+    model_path='',
+    batch_size=20000
+):
+    """basic prediction logic"""
+    if model_type == 'lgb':
+        model = lgb.Booster(model_file=model_path)
+    if model_type == 'xgb':
+        model = create_model(model_type='xgb')
+        model.load_model(model_path)
+    if model_type == 'joblib':
+        model = joblib.load(filename=model_path)
+    X_test = df
+    preds = model.predict_in_batch(model, X_test, batch_size=batch_size)
+    return preds
+
+
+# predict in batches. xgb and lgb supported only atm
+def get_predictions_parallel(df=None, num_models=1, prefix=None, folder_name=None, model_type='xgb', batch_size=20000):
+    """
+    Function that implements the get_predictions logic, only using ThreadPoolExecutor class
+
+    :param df: dataframe with the features used to train and predict
+    :param num_models: number of models in the folder
+    :param prefix: prefix to choose specific models from the folder - use it only if you had run a CV scheme
+                   for many different targets or something
+    :param folder_name: name of the folder
+    :param model_type: xgb or lgb
+    :param batch_size: predict in batch_size equal to this number
+    :return: np.array with predictions for the df
+    """
+    model_lst = get_model_lst(num_models=num_models, prefix=prefix, folder_name=folder_name)
+    predictions_total = []
+    # go parallel
+    _futures = []
+    names_batch_lst = [[x,batch_size] for x in model_lst]
+    for model_batch in names_batch_lst:
+        with ThreadPoolExecutor() as executor:
+            _futures.append(
+                executor.submit(
+                    single_predict,
+                    df=df,
+                    model_path=model_batch[0],
+                    batch_size=model_batch[1]
+                )
+            )
+    predictions = []
+    for future in tqdm(as_completed(_futures), total=len(_futures)):
+        pred = future.get_result()
+        predictions.append(pred)
+
+    predictions_total = np.mean(predictions,axis=0)
+
+    return predictions_total
