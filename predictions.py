@@ -7,7 +7,7 @@ from tqdm.notebook import tqdm
 import os
 import gc
 import joblib
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from Signals.model_handling import get_model_lst, create_model
 
@@ -279,6 +279,7 @@ def get_predictions_per_era_joblib(df, preds_cache_file=None, num_models=1, pref
 def single_predict(
     df=None,
     model_path='',
+    model_type='xgb',
     batch_size=20000
 ):
     """basic prediction logic"""
@@ -290,7 +291,7 @@ def single_predict(
     if model_type == 'joblib':
         model = joblib.load(filename=model_path)
     X_test = df
-    preds = model.predict_in_batch(model, X_test, batch_size=batch_size)
+    preds = predict_in_batch(model, X_test, batch=batch_size)
     return preds
 
 
@@ -311,8 +312,8 @@ def get_predictions_parallel(df=None, num_models=1, prefix=None, folder_name=Non
     model_lst = get_model_lst(num_models=num_models, prefix=prefix, folder_name=folder_name)
     predictions_total = []
     # go parallel
+    names_batch_lst = [[x,model_type,batch_size] for x in model_lst]
     _futures = []
-    names_batch_lst = [[x,batch_size] for x in model_lst]
     for model_batch in names_batch_lst:
         with ThreadPoolExecutor() as executor:
             _futures.append(
@@ -320,7 +321,8 @@ def get_predictions_parallel(df=None, num_models=1, prefix=None, folder_name=Non
                     single_predict,
                     df=df,
                     model_path=model_batch[0],
-                    batch_size=model_batch[1]
+                    model_type=model_batch]1],
+                    batch_size=model_batch[2]
                 )
             )
     predictions = []
