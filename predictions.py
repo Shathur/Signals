@@ -321,7 +321,7 @@ def get_predictions_parallel(df=None, num_models=1, prefix=None, folder_name=Non
                     single_predict,
                     df=df,
                     model_path=model_batch[0],
-                    model_type=model_batch]1],
+                    model_type=model_batch[1],
                     batch_size=model_batch[2]
                 )
             )
