@@ -7,11 +7,11 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta, FR
 import pickle
 import gc
-from Signals.cross_validation import cv_split_creator, TimeSeriesSplitGroups, TimeSeriesSplitGroupsPurged, RandomSplits, WindowedGroups
-from Signals.utils import check_enough_tickers, start_end_date, check_if_live
-from Signals.train import train_val, submit_signal
-from Signals.predictions import get_predictions
-from Signals.setup_env_variables import setup
+from .cross_validation import cv_split_creator, TimeSeriesSplitGroups, TimeSeriesSplitGroupsPurged, RandomSplits, WindowedGroups
+from .utils import check_enough_tickers, start_end_date, check_if_live
+from .train import train_val, submit_signal
+from .predictions import get_predictions
+from setup_env_variables import setup
 
 class CV_scheme():
     RandomSplits = RandomSplits
@@ -45,7 +45,7 @@ class Trainer:
     :: param: model_params: dict
     :: param: fit_params: dict
     :: param: col:str
-    :: param: cv_scheme: CV_sheme
+    :: param: cv_scheme: CV_scheme
     :: param: n_splits: int
     :: param: is_string: bool
     :: param: extra_constructor_params: dict
@@ -221,6 +221,20 @@ class Trainer:
             folder_name=save_folder
         ) 
         return live_sub
+    
+    def prepare_sub_for_submission(self, sub):
+        """prepare dataframe for submission"""
+        sub = check_if_live(sub, 'friday_date') 
+        # select necessary columns
+        sub = sub[['ticker', 'friday_date', 'data_type', 'signal']]
+        # rename ticker
+        sub = sub.rename(columns={'ticker':'bloomberg_ticker'})
+        # until now date was an integer. That was accomodating to our needs
+        # now we need to transform it into the appropriate format
+        date_col = [c for c in sub.columns.tolist() if 'date' in c]
+        sub[date_col[0]] = pd.to_datetime(sub[date_col[0]],format='%Y%m%d').dt.strftime('%Y-%m-%d')
+        return sub
+        
 
     def create_submit_sub(
         self, 
@@ -241,10 +255,9 @@ class Trainer:
         secret_key = os.getenv('SECRET_KEY')
         # concat valid and test
         sub = pd.concat([validation_sub, live_sub], ignore_index=True)
-        # prepare for submission
-        sub = check_if_live(sub, 'friday_date') 
-        # select necessary columns
-        sub = sub[['ticker', 'friday_date', 'data_type', 'signal']]
+        # prepare sub for submission
+        sub = self.prepare_sub_for_submission(sub)
+        print(f'Our sub before submission is: {sub}')
         # submit
         submit_signal(sub, public_key, secret_key, submit, submit_diagnostics, model_name, upload_name=upload_name)
         # submit reverse
