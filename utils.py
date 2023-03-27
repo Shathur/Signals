@@ -145,6 +145,7 @@ def load_obj(name):
     with open(name + '.pkl', 'rb') as f:
         return pickle.load(f)
 
+
 def check_enough_tickers(df, use_last_available=False, date_col='friday_date'):
     # check if for some reason last friday is missing and use another date instead
     last_friday = datetime.now() + relativedelta(weekday=FR(-1))
@@ -165,6 +166,7 @@ def check_enough_tickers(df, use_last_available=False, date_col='friday_date'):
         print(f'We are using the last available date: {last_friday}')
     return last_friday
 
+
 def check_if_live(
     sub,
     date_col
@@ -175,3 +177,30 @@ def check_if_live(
     print(f'Last available day {dates_lst[-1]}')
     sub.loc[sub[date_col]==dates_lst[-1],'data_type'] = 'live'
     return sub
+
+
+def get_era_idx(df, col='era'):
+    """
+    get the indices of each era in a list format
+    
+    returns: [era1_idx_lst, era2_idx_lst, ... . eran_idx_lst]
+    """
+    era_lst = df[col].unique()
+    era_idx = [df[df[col] == x].index for x in era_lst]
+    return era_idx
+
+
+def corr_score(df, pred_name, target_name='target', group_name='era'):
+    # Check the per-era correlations on the validation set (out of sample)
+    correlations = df.groupby(group_name).apply(lambda x: score(x, pred_name, target_name))
+    return correlations
+
+
+def sharpe_score(correlations):
+    # Check the "sharpe" ratio on the validation set
+    sharpe = correlations.mean() / correlations.std(ddof=0)
+    return sharpe
+
+
+def spearman(y_true, y_pred):
+    return spearmanr(y_pred, y_true).correlation
