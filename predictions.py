@@ -77,10 +77,10 @@ def get_predictions(df=None, num_models=1, prefix=None, folder_name=None, model_
     return predictions_total
 
 
-# predict in batches on a per-era basis. xgb and lgb supported only atm
 def get_predictions_per_era(df=None, num_models=1, prefix=None, folder_name=None, era_idx=[],
                             model_type='xgb', rank_average=False):
     """
+    predict in batches on a per-era basis. xgb and lgb supported only atm
 
     :param df: dataframe with the features used to train and predict
     :param num_models: number of models in the folder
@@ -92,7 +92,11 @@ def get_predictions_per_era(df=None, num_models=1, prefix=None, folder_name=None
     :param rank_average: True - rank the predictions per era or False -  total ranks in the whole dataframe
     :return: final predictions with proper dimensions for further use
     """
-    model_lst = get_model_lst(num_models=num_models, prefix=prefix, folder_name=folder_name)
+    model_lst = get_model_lst(
+        num_models=num_models,
+        prefix=prefix,
+        folder_name=folder_name
+    )
     predictions_total = []
 
     X_test = df
@@ -327,7 +331,8 @@ def get_predictions_parallel(df=None, num_models=1, prefix=None, folder_name=Non
             )
     predictions = []
     for future in tqdm(as_completed(_futures), total=len(_futures)):
-        pred = future.get_result()
+        # pred = future.get_result()
+        pred = future.set_result()
         predictions.append(pred)
 
     predictions_total = np.mean(predictions,axis=0)
