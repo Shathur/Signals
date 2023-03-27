@@ -1,7 +1,7 @@
 import pandas as pd
 
-from predictions import get_predictions_per_era
-from utils import get_era_idx, spearman
+from Signals.predictions import get_predictions_per_era
+from Signals.utils import get_era_idx, spearman
 
 class EraBooster:
     """
