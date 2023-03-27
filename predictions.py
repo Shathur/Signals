@@ -332,7 +332,7 @@ def get_predictions_parallel(df=None, num_models=1, prefix=None, folder_name=Non
     predictions = []
     for future in tqdm(as_completed(_futures), total=len(_futures)):
         # pred = future.get_result()
-        pred = future.set_result()
+        pred = future.result()
         predictions.append(pred)
 
     predictions_total = np.mean(predictions,axis=0)
