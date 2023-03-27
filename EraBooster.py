@@ -34,16 +34,16 @@ class EraBooster:
         added_trees,
         quantile,
     ):
-        self.model = model,
-        self.date_col = date_col,
-        self.prediction_col = prediction_col,
-        self.target_col = target_col,
-        self.added_trees = added_trees,
-        self.quantile = quantile,
+        self.model = model
+        self.date_col = date_col
+        self.prediction_col = prediction_col
+        self.target_col = target_col
+        self.added_trees = added_trees
+        self.quantile = quantile
         
-        self.iteration = 0,
+        self.iteration = 0
         self.era_diff_test_total_lst = []
-        self.worst_eras_total = [],
+        self.worst_eras_total = []
 
     def train_first(
         self,
