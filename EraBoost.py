@@ -1,4 +1,4 @@
-from basic_functions import get_era_idx, corr_score, sharpe_score
+from utils import get_era_idx, corr_score, sharpe_score
 from predictions import predict_in_batch, predict_in_era_batch
 
 import pandas as pd
@@ -24,8 +24,7 @@ def era_boost(
 ):
     worst_eras_total = []
     era_scores_train = pd.Series(index=train_df[date_col].unique())
-    era_scores_tour = pd.Series(index=tour_df[date_col].unique())
-    era_diff_tour = pd.Series(index=tour_df[date_col].unique())
+    era_scores_tour = pd.Series(index=tour_df[date_col].unique()) era_diff_tour = pd.Series(index=tour_df[date_col].unique())
     era_diff_tour_total_lst = []
     for i in range(_iterations):
         if i == 0:
