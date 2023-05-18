@@ -131,7 +131,7 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
                        val_preds_total,
                        tour_preds_total]
     else:
-        feat_importances=pd.DatafFrame() 
+        feat_importances=pd.DataFrame() 
         diagnostics_per_split_df = pd.DataFrame()
         preds_total=[]
 
