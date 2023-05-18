@@ -19,7 +19,7 @@ def try_get_predictions():
 
 
 def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
-              tour_df=None, model_type='xgb', model_params=None, fit_params=None,
+              tour_df=None, model_type='xgb', model_params=None, fit_params=None, calculate_metrics=True,
               save_to_drive='False', legacy_save=True, save_folder='None', visualize=True):
     """
 
@@ -70,64 +70,70 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
 
         if visualize:
             utils.plot_feature_importances(feature_names, model)
-        if model_type=='lgb':
-            feat_importances = model.feature_importance(importance_type='gain')
-        else:
-            feat_importances = model.feature_importances_
-        feat_importances_dict = dict(zip(feature_names, feat_importances))
-        feat_importances_total.append(feat_importances_dict)
 
-        train_preds = model.predict(train_data[feature_names])
-        val_preds = model.predict(val_data[feature_names])
+        if calculate_metrics:
+            if model_type=='lgb':
+                feat_importances = model.feature_importance(importance_type='gain')
+            else:
+                feat_importances = model.feature_importances_
+            feat_importances_dict = dict(zip(feature_names, feat_importances))
+            feat_importances_total.append(feat_importances_dict)
 
-        train_preds_total.append(train_preds)
-        val_preds_total.append(val_preds)
+            train_preds = model.predict(train_data[feature_names])
+            val_preds = model.predict(val_data[feature_names])
 
-        train_data[pred_name] = train_preds
-        val_data[pred_name] = val_preds
+            train_preds_total.append(train_preds)
+            val_preds_total.append(val_preds)
 
-        if visualize:
-            # show prediction distribution, most should be around the center
-            val_data[pred_name].hist(bins=30)
+            train_data[pred_name] = train_preds
+            val_data[pred_name] = val_preds
 
-        # spearman scores by era
-        train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
-        val_era_scores = val_data.groupby(val_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
+            if visualize:
+                # show prediction distribution, most should be around the center
+                val_data[pred_name].hist(bins=30)
 
-        # test scores, out of sample
-        hit_train = run_analytics(train_era_scores)
-        hit_val = run_analytics(val_era_scores, plot_figures=visualize)
+            # spearman scores by era
+            train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
+            val_era_scores = val_data.groupby(val_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
 
-        # keep everything in a neat dataframe
-        train_start, train_end = utils.start_end_date(train_data, date_col)
-        val_start, val_end = utils.start_end_date(val_data, date_col)
+            # test scores, out of sample
+            hit_train = run_analytics(train_era_scores)
+            hit_val = run_analytics(val_era_scores, plot_figures=visualize)
 
-        if ((tour_df is not None) and (not tour_df.empty)):
-            tour_preds = model.predict(tour_df[feature_names])
-            tour_preds_total.append(tour_preds)
-            tour_df[pred_name] = tour_preds
-            tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
-            hit_tour = run_analytics(tour_era_scores)
+            # keep everything in a neat dataframe
+            train_start, train_end = utils.start_end_date(train_data, date_col)
+            val_start, val_end = utils.start_end_date(val_data, date_col)
 
-        dic = {'train_start': train_start,
-               'train_end': train_end,
-               'train_hit': hit_train,
-               'val_start': val_start,
-               'val_end': val_end,
-               'val_hit': hit_val}
+            if ((tour_df is not None) and (not tour_df.empty)):
+                tour_preds = model.predict(tour_df[feature_names])
+                tour_preds_total.append(tour_preds)
+                tour_df[pred_name] = tour_preds
+                tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
+                hit_tour = run_analytics(tour_era_scores)
 
-        if ((tour_df is not None) and (not tour_df.empty)):
-            dic.update({'tour_hit': hit_tour})
+            dic = {'train_start': train_start,
+                   'train_end': train_end,
+                   'train_hit': hit_train,
+                   'val_start': val_start,
+                   'val_end': val_end,
+                   'val_hit': hit_val}
 
-        diagnostics_per_split.append(dic)
+            if ((tour_df is not None) and (not tour_df.empty)):
+                dic.update({'tour_hit': hit_tour})
 
-    # keep everything in a tidy df
-    feat_importances_df = pd.DataFrame(feat_importances_total)
-    diagnostics_per_split_df = pd.DataFrame(diagnostics_per_split)
+            diagnostics_per_split.append(dic)
 
-    preds_total = [train_preds_total,
-                   val_preds_total,
-                   tour_preds_total]
+        # keep everything in a tidy df
+        feat_importances_df = pd.DataFrame(feat_importances_total)
+        diagnostics_per_split_df = pd.DataFrame(diagnostics_per_split)
+
+        preds_total = [train_preds_total,
+                       val_preds_total,
+                       tour_preds_total]
+    else:
+        feat_importances=pd.DatafFrame() 
+        diagnostics_per_split_df = pd.DataFrame()
+        preds_total=[]
 
     return feat_importances_df, diagnostics_per_split_df, preds_total
 
