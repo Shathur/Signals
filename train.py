@@ -4,7 +4,7 @@ import os
 import shutil
 from datetime import datetime
 from dateutil.relativedelta import relativedelta, FR
-import numerapi
+# import numerapi
 import gc
 
 from Signals.predictions import get_predictions
