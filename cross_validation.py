@@ -93,9 +93,11 @@ class TimeSeriesSplitGroupsPurged(_BaseKFold):
             for test_start in test_starts:
                 yield (indices[groups.isin(group_list[:test_start-embg_grp_num])],
                        indices[groups.isin(group_list[test_start+embg_grp_num : test_start+embg_grp_num + test_size])])
-        else:
+        elif n_splits==1:
             yield (indices[groups.isin(group_list[:int(0.8*len(group_list))-embg_grp_num])],
                     indices[groups.isin(group_list[int(0.8*len(group_list))+embg_grp_num:])])
+        else:
+            raise ValueError(f"Invalid split value of {n_splits}")
 
 
 class PurgedKfold(_BaseKFold):
