@@ -5,7 +5,7 @@ import json
 
 
 # get models into a list for iteration on them
-def get_model_lst(num_models=1, prefix=None, folder_name=None):
+def get_model_lst(num_models=1, prefix=None, folder_name=None, print_model_lst=False):
     """
     Parameters
     ----------
@@ -24,7 +24,9 @@ def get_model_lst(num_models=1, prefix=None, folder_name=None):
         model_lst_final = model_lst[0:num_models]
     else:
         model_lst_final = model_lst
-    print(model_lst_final)
+    if print_model_lst:
+        print("the list of our available models:")
+        print(model_lst_final)
 
     return model_lst_final
 

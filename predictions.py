@@ -50,6 +50,7 @@ def get_predictions(
     folder_name=None,
     model_type="xgb",
     batch_size=20000,
+    print_model_lst=False,
 ):
     """
 
@@ -63,7 +64,10 @@ def get_predictions(
     :return: np.array with predictions for the df
     """
     model_lst = get_model_lst(
-        num_models=num_models, prefix=prefix, folder_name=folder_name
+        num_models=num_models,
+        prefix=prefix,
+        folder_name=folder_name,
+        print_model_lst=print_model_lst,
     )
     predictions_total = []
     for cv_num in range(num_models):
@@ -94,6 +98,7 @@ def get_predictions_per_era(
     era_idx=[],
     model_type="xgb",
     rank_average=False,
+    print_model_lst=False,
 ):
     """
     predict in batches on a per-era basis. xgb and lgb supported only atm
@@ -109,7 +114,10 @@ def get_predictions_per_era(
     :return: final predictions with proper dimensions for further use
     """
     model_lst = get_model_lst(
-        num_models=num_models, prefix=prefix, folder_name=folder_name
+        num_models=num_models,
+        prefix=prefix,
+        folder_name=folder_name,
+        print_model_lst=print_model_lst,
     )
     predictions_total = []
 
@@ -153,6 +161,7 @@ def get_predictions_per_era_joblib(
     folder_name=None,
     rank_average=False,
     first_week=False,
+    print_model_lst=False,
 ):
     """
 
@@ -185,7 +194,10 @@ def get_predictions_per_era_joblib(
         cache = {-1: []}
 
     model_lst = get_model_lst(
-        num_models=num_models, prefix=prefix, folder_name=folder_name
+        num_models=num_models,
+        prefix=prefix,
+        folder_name=folder_name,
+        print_model_lst=print_model_lst,
     )
     predictions_total = []
     predictions_total_era_x = []
@@ -368,6 +380,7 @@ def get_predictions_parallel(
     folder_name=None,
     model_type="xgb",
     batch_size=20000,
+    print_model_lst=False,
 ):
     """
     Function that implements the get_predictions logic, only using ThreadPoolExecutor class
@@ -382,7 +395,10 @@ def get_predictions_parallel(
     :return: np.array with predictions for the df
     """
     model_lst = get_model_lst(
-        num_models=num_models, prefix=prefix, folder_name=folder_name
+        num_models=num_models,
+        prefix=prefix,
+        folder_name=folder_name,
+        print_model_lst=print_model_lst,
     )
     predictions_total = []
     # go parallel
@@ -418,11 +434,13 @@ def get_predictions_per_era_parallel(
     folder_name=None,
     era_idx=[],
     rank_average=True,
+    print_model_lst=False,
 ):
     model_lst = get_model_lst(
         num_models=num_models,
         prefix=prefix,
         folder_name=folder_name,
+        print_model_lst=print_model_lst,
     )
     predictions_total = []
     # go parallel
