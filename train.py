@@ -4,6 +4,7 @@ import os
 import shutil
 from datetime import datetime
 from dateutil.relativedelta import relativedelta, FR
+
 # import numerapi
 import gc
 
@@ -15,12 +16,26 @@ from Signals.utils import load_obj, run_analytics, plot_feature_importances
 
 
 def try_get_predictions():
-    a = get_predictions(model='model')
+    a = get_predictions(model="model")
 
 
-def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col='date',
-              tour_df=None, model_type='xgb', model_params=None, fit_params=None, calculate_metrics=True,
-              save_to_drive='False', legacy_save=True, save_folder='None', visualize=True):
+def train_val(
+    df,
+    feature_names,
+    target_name,
+    pred_name,
+    cv_split_data,
+    date_col="date",
+    tour_df=None,
+    model_type="xgb",
+    model_params=None,
+    fit_params=None,
+    calculate_metrics=True,
+    save_to_drive="False",
+    legacy_save=True,
+    save_folder="None",
+    visualize=True,
+):
     """
 
     :param date_col: time column
@@ -56,24 +71,44 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         X_val = val_data[feature_names]
         y_val = val_data[target_name]
 
-        print('********************************************************************************************')
-        print("Training model on CV : {} with indices  train: {} to {}".format(cv_count, idx_cv[0][0], idx_cv[0][-1]))
-        print('                                         val: {} to {}'.format(idx_cv[1][0], idx_cv[1][-1]))
-        print('********************************************************************************************')
+        print(
+            "********************************************************************************************"
+        )
+        print(
+            "Training model on CV : {} with indices  train: {} to {}".format(
+                cv_count, idx_cv[0][0], idx_cv[0][-1]
+            )
+        )
+        print(
+            "                                         val: {} to {}".format(
+                idx_cv[1][0], idx_cv[1][-1]
+            )
+        )
+        print(
+            "********************************************************************************************"
+        )
 
         train_tuple = [X_train, y_train]
         val_tuple = [X_val, y_val]
 
-        model = model_handling.run_model(train_data=train_tuple, val_data=val_tuple, model_type=model_type,
-                                 model_params=model_params, fit_params=fit_params, save_to_drive=save_to_drive,
-                                 legacy_save=legacy_save, save_folder=save_folder, cv_count=cv_count)
+        model = model_handling.run_model(
+            train_data=train_tuple,
+            val_data=val_tuple,
+            model_type=model_type,
+            model_params=model_params,
+            fit_params=fit_params,
+            save_to_drive=save_to_drive,
+            legacy_save=legacy_save,
+            save_folder=save_folder,
+            cv_count=cv_count,
+        )
 
         if visualize:
             utils.plot_feature_importances(feature_names, model)
 
         if calculate_metrics:
-            if model_type=='lgb':
-                feat_importances = model.feature_importance(importance_type='gain')
+            if model_type == "lgb":
+                feat_importances = model.feature_importance(importance_type="gain")
             else:
                 feat_importances = model.feature_importances_
             feat_importances_dict = dict(zip(feature_names, feat_importances))
@@ -93,8 +128,12 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
                 val_data[pred_name].hist(bins=30)
 
             # spearman scores by era
-            train_era_scores = train_data.groupby(train_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
-            val_era_scores = val_data.groupby(val_data[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
+            train_era_scores = train_data.groupby(train_data[date_col]).apply(
+                lambda x: utils.score(x, target_name, pred_name)
+            )
+            val_era_scores = val_data.groupby(val_data[date_col]).apply(
+                lambda x: utils.score(x, target_name, pred_name)
+            )
 
             # test scores, out of sample
             hit_train = run_analytics(train_era_scores)
@@ -104,22 +143,26 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
             train_start, train_end = utils.start_end_date(train_data, date_col)
             val_start, val_end = utils.start_end_date(val_data, date_col)
 
-            if ((tour_df is not None) and (not tour_df.empty)):
+            if (tour_df is not None) and (not tour_df.empty):
                 tour_preds = model.predict(tour_df[feature_names])
                 tour_preds_total.append(tour_preds)
                 tour_df[pred_name] = tour_preds
-                tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(lambda x: utils.score(x, target_name, pred_name))
+                tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(
+                    lambda x: utils.score(x, target_name, pred_name)
+                )
                 hit_tour = run_analytics(tour_era_scores)
 
-            dic = {'train_start': train_start,
-                   'train_end': train_end,
-                   'train_hit': hit_train,
-                   'val_start': val_start,
-                   'val_end': val_end,
-                   'val_hit': hit_val}
+            dic = {
+                "train_start": train_start,
+                "train_end": train_end,
+                "train_hit": hit_train,
+                "val_start": val_start,
+                "val_end": val_end,
+                "val_hit": hit_val,
+            }
 
-            if ((tour_df is not None) and (not tour_df.empty)):
-                dic.update({'tour_hit': hit_tour})
+            if (tour_df is not None) and (not tour_df.empty):
+                dic.update({"tour_hit": hit_tour})
 
             diagnostics_per_split.append(dic)
 
@@ -127,43 +170,58 @@ def train_val(df, feature_names, target_name, pred_name, cv_split_data, date_col
         feat_importances_df = pd.DataFrame(feat_importances_total)
         diagnostics_per_split_df = pd.DataFrame(diagnostics_per_split)
 
-        preds_total = [train_preds_total,
-                       val_preds_total,
-                       tour_preds_total]
+        preds_total = [train_preds_total, val_preds_total, tour_preds_total]
     else:
-        feat_importances=pd.DataFrame() 
+        feat_importances = pd.DataFrame()
         diagnostics_per_split_df = pd.DataFrame()
-        preds_total=[]
+        preds_total = []
 
     return feat_importances_df, diagnostics_per_split_df, preds_total
 
 
-def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name='target', pred_name='prediction',
-             n_splits=4, model_params=None, fit_params=None, model_type='xgb',
-             submit=True, submit_diagnostics=False, submit_reverse=False, submit_diagnostics_reverse=False,
-             model_name_reverse=None,
-             models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
+def train_CV(
+    data_dir,
+    last_friday,
+    features_boundaries,
+    model_name,
+    target_name="target",
+    pred_name="prediction",
+    n_splits=4,
+    model_params=None,
+    fit_params=None,
+    model_type="xgb",
+    submit=True,
+    submit_diagnostics=False,
+    submit_reverse=False,
+    submit_diagnostics_reverse=False,
+    model_name_reverse=None,
+    models_save_folder="/content/mymodels/",
+    upload_name="signal_upload",
+    napi_credentials={},
+):
     # # preprocess data
     # prices_df, train_df, feature_names = prepare_dataset(data_dir, features_start)
 
     train_df = pd.read_pickle(data_dir)
 
-    train_without_live = train_df[train_df['friday_date'] < last_friday]
+    train_without_live = train_df[train_df["friday_date"] < last_friday]
     train_without_live.dropna(inplace=True)
-    train_df = pd.concat([train_without_live, train_df[train_df['friday_date'] == last_friday]])
+    train_df = pd.concat(
+        [train_without_live, train_df[train_df["friday_date"] == last_friday]]
+    )
 
     # feature_names = train_df.columns[
     #                 train_df.columns.str.find(features_boundaries[0]).argmax(): train_df.columns.str.find(
     #                     features_boundaries[1]).argmax() + 1].tolist()
 
     # drops = ['data_type', 'target_4d', 'target_20d', 'friday_date', 'ticker', 'bloomberg_ticker']
-    targets_columns = [t for t in train_df.columns.tolist() if t.startswith('target')]
-    standard_columns = ['data_type', 'friday_date', 'ticker', 'bloomberg_ticker']
+    targets_columns = [t for t in train_df.columns.tolist() if t.startswith("target")]
+    standard_columns = ["data_type", "friday_date", "ticker", "bloomberg_ticker"]
     drops = standard_columns + targets_columns
     feature_names = [f for f in train_df.columns.values.tolist() if f not in drops]
 
     # split data
-    cv_split_data = cv_split_creator(df=train_df, col='friday_date', n_splits=n_splits)
+    cv_split_data = cv_split_creator(df=train_df, col="friday_date", n_splits=n_splits)
 
     # keep data for validation of the CV strategy
     tour_data = train_df.iloc[cv_split_data[0][1]]
@@ -172,19 +230,21 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
         shutil.rmtree(models_save_folder)  # delete dir + models
     os.mkdir(models_save_folder)  # create dir from scratch
 
-    metrics = train_val(df=train_df,
-                        date_col='friday_date',
-                        feature_names=feature_names,
-                        target_name=target_name,
-                        pred_name=pred_name,
-                        cv_split_data=cv_split_data,
-                        tour_df=tour_data,
-                        model_params=model_params,
-                        fit_params=fit_params,
-                        model_type=model_type,
-                        save_to_drive=True,
-                        save_folder=models_save_folder,
-                        visualize=True)
+    metrics = train_val(
+        df=train_df,
+        date_col="friday_date",
+        feature_names=feature_names,
+        target_name=target_name,
+        pred_name=pred_name,
+        cv_split_data=cv_split_data,
+        tour_df=tour_data,
+        model_params=model_params,
+        fit_params=fit_params,
+        model_type=model_type,
+        save_to_drive=True,
+        save_folder=models_save_folder,
+        visualize=True,
+    )
 
     # preds_total = metrics[2]
     # tour_preds_total = preds_total[2]
@@ -200,40 +260,66 @@ def train_CV(data_dir, last_friday, features_boundaries, model_name, target_name
 
     validation_sub = tour_data.copy()
 
-    validation_sub['signal'] = validation_predictions
+    validation_sub["signal"] = validation_predictions
 
     # live sub
-    train_df.loc[train_df['friday_date'] == last_friday, 'data_type'] = 'live'
+    train_df.loc[train_df["friday_date"] == last_friday, "data_type"] = "live"
 
     live_sub = train_df.query('data_type == "live"').copy()
 
-    live_sub['signal'] = get_predictions(df=live_sub[feature_names],
-                                         num_models=4,
-                                         folder_name=models_save_folder)
+    live_sub["signal"] = get_predictions(
+        df=live_sub[feature_names], num_models=4, folder_name=models_save_folder
+    )
 
     # concat valid and test
     sub = pd.concat([validation_sub, live_sub], ignore_index=True)
 
     # select necessary columns
-    sub = sub[['ticker', 'friday_date', 'data_type', 'signal']]
+    sub = sub[["ticker", "friday_date", "data_type", "signal"]]
 
     # submit
-    submit_signal(sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit, submit_diagnostics, model_name, upload_name=upload_name)
+    submit_signal(
+        sub,
+        napi_credentials["public_id"],
+        napi_credentials["secret_key"],
+        submit,
+        submit_diagnostics,
+        model_name,
+        upload_name=upload_name,
+    )
 
     # submit reverse
     if submit_reverse:
         reverse_sub = sub
-        reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
+        reverse_sub["signal"] = reverse_sub.groupby("friday_date")["signal"].rank(
+            pct=True, method="first", ascending=False
+        )
         reverse_sub.reset_index(drop=True, inplace=True)
-        submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
-                      upload_name)
+        submit_signal(
+            reverse_sub,
+            napi_credentials["public_id"],
+            napi_credentials["secret_key"],
+            submit_reverse,
+            submit_diagnostics_reverse,
+            model_name_reverse,
+            upload_name,
+        )
 
     # free memory
     gc.collect()
 
 
-def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bool, submit_diagnostics: bool,
-                  slot_name: str, upload_name: str, predictions_folder='default', delete_after_upload=False,):
+def submit_signal(
+    sub: pd.DataFrame,
+    public_id: str,
+    secret_key: str,
+    submit: bool,
+    submit_diagnostics: bool,
+    slot_name: str,
+    upload_name: str,
+    predictions_folder="default",
+    delete_after_upload=False,
+):
     """
     submit numerai signals prediction
     predictions folder: when 'default' save in the same folder of the module
@@ -241,12 +327,16 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
     """
     # setup private API
     napi = numerapi.SignalsAPI(public_id, secret_key)
-    model_id = napi.get_models()[f'{slot_name}']
+    model_id = napi.get_models()[f"{slot_name}"]
     # get file path
-    if predictions_folder == 'default':
+    if predictions_folder == "default":
         filename = f"{upload_name}.csv"
     else:
-        filename = os.path.abspath(os.path.join(os.path.dirname(__file__),predictions_folder,f"{upload_name}.csv"))
+        filename = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), predictions_folder, f"{upload_name}.csv"
+            )
+        )
     # filename = f"{upload_name}.csv"
     sub.to_csv(filename, index=False)
     # submit_diagnostics
@@ -255,50 +345,68 @@ def submit_signal(sub: pd.DataFrame, public_id: str, secret_key: str, submit: bo
         # filename = f"{upload_name}.csv"
         sub.query('data_type == "validation"').to_csv(filename, index=False)
         napi.upload_diagnostics(filename, model_id=model_id)
-        print('Validation prediction uploaded for diagnostics!')
+        print("Validation prediction uploaded for diagnostics!")
     # submit
     if submit:
         try:
             napi.upload_predictions(filename, model_id=model_id)
-            print(f'Submitted : {slot_name}!')
+            print(f"Submitted : {slot_name}!")
         except Exception as e:
-            print(f'Submission failure: {e}')
+            print(f"Submission failure: {e}")
     # try to remove file to avoid clutter
     try:
-        if delete_after_upload==True:
-            os.remove(filename)        
+        if delete_after_upload == True:
+            os.remove(filename)
     except Exception as e:
-        print(f'No file found for removal: {e}')
+        print(f"No file found for removal: {e}")
 
 
-def train_combine_CV(data_dir, imp_feats, feature_df, last_friday, model_name, n_splits=10,
-                    target_name='target',pred_name='prediction', model_params=None, fit_params=None, model_type='xgb',
-                    submit=True, submit_diagnostics=False, submit_reverse=False,
-                    submit_diagnostics_reverse=False, model_name_reverse=None,
-                    models_save_folder='/content/mymodels/', upload_name='signal_upload', napi_credentials={}):
+def train_combine_CV(
+    data_dir,
+    imp_feats,
+    feature_df,
+    last_friday,
+    model_name,
+    n_splits=10,
+    target_name="target",
+    pred_name="prediction",
+    model_params=None,
+    fit_params=None,
+    model_type="xgb",
+    submit=True,
+    submit_diagnostics=False,
+    submit_reverse=False,
+    submit_diagnostics_reverse=False,
+    model_name_reverse=None,
+    models_save_folder="/content/mymodels/",
+    upload_name="signal_upload",
+    napi_credentials={},
+):
     # # preprocess data
     # prices_df, train_df, feature_names = prepare_dataset(data_dir, features_start)
 
     train_v2_df = pd.read_parquet(data_dir)
     most_imp_v2_feats = load_obj(imp_feats)
-    la = ['ticker', 'date', 'friday_date']
+    la = ["ticker", "date", "friday_date"]
     la.extend(most_imp_v2_feats)
-    train_v2_imp_df = train_v2_df.loc[:, la]  # train_v2_df.columns.isin(most_imp_v2_feats),
+    train_v2_imp_df = train_v2_df.loc[
+        :, la
+    ]  # train_v2_df.columns.isin(most_imp_v2_feats),
 
     # keep only common dates to save memory
-    feature_df = feature_df[feature_df['friday_date'].isin(train_v2_df['friday_date'].unique())]
+    feature_df = feature_df[
+        feature_df["friday_date"].isin(train_v2_df["friday_date"].unique())
+    ]
 
     feature_df = feature_df.merge(
-        train_v2_imp_df,
-        how='left',
-        on=['friday_date', 'ticker']
+        train_v2_imp_df, how="left", on=["friday_date", "ticker"]
     )
 
     # feature_df.dropna(inplace=True)
 
     # drops = ['data_type', 'target_4d', 'target_20d', 'friday_date', 'ticker', 'bloomberg_ticker']
-    targets_columns = [t for t in feature_df.columns.tolist() if t.startswith('target')]
-    standard_columns = ['data_type', 'friday_date', 'ticker', 'bloomberg_ticker']
+    targets_columns = [t for t in feature_df.columns.tolist() if t.startswith("target")]
+    standard_columns = ["data_type", "friday_date", "ticker", "bloomberg_ticker"]
     drops = standard_columns + targets_columns
     feature_names = [f for f in feature_df.columns.values.tolist() if f not in drops]
 
@@ -308,15 +416,17 @@ def train_combine_CV(data_dir, imp_feats, feature_df, last_friday, model_name, n
     del train_v2_df, train_v2_imp_df, feature_df
     gc.collect()
 
-    train_without_live = train_df[train_df['friday_date'] < last_friday]
+    train_without_live = train_df[train_df["friday_date"] < last_friday]
     train_without_live.dropna(inplace=True)
-    train_df = pd.concat([train_without_live, train_df[train_df['friday_date'] == last_friday]])
+    train_df = pd.concat(
+        [train_without_live, train_df[train_df["friday_date"] == last_friday]]
+    )
 
     # feature_names = train_df.columns[train_df.columns.str.find(features_boundaries[0]).argmax():
     # train_df.columns.str.find(features_boundaries[1]).argmax()+1].tolist()
 
     # split data
-    cv_split_data = cv_split_creator(df=train_df, col='friday_date', n_splits=n_splits)
+    cv_split_data = cv_split_creator(df=train_df, col="friday_date", n_splits=n_splits)
 
     # keep data for validation of the CV strategy
     tour_data = train_df.iloc[cv_split_data[0][1]]
@@ -325,19 +435,21 @@ def train_combine_CV(data_dir, imp_feats, feature_df, last_friday, model_name, n
         shutil.rmtree(models_save_folder)  # delete dir + models
     os.mkdir(models_save_folder)  # create dir from scratch
 
-    metrics = train_val(df=train_df,
-                        feature_names=feature_names,
-                        date_col='friday_date',
-                        target_name=target_name,
-                        pred_name=pred_name,
-                        cv_split_data=cv_split_data,
-                        tour_df=tour_data,
-                        model_params=model_params,
-                        fit_params=fit_params,
-                        model_type=model_type,
-                        save_to_drive=True,
-                        save_folder=models_save_folder,
-                        visualize=True)
+    metrics = train_val(
+        df=train_df,
+        feature_names=feature_names,
+        date_col="friday_date",
+        target_name=target_name,
+        pred_name=pred_name,
+        cv_split_data=cv_split_data,
+        tour_df=tour_data,
+        model_params=model_params,
+        fit_params=fit_params,
+        model_type=model_type,
+        save_to_drive=True,
+        save_folder=models_save_folder,
+        visualize=True,
+    )
 
     # preds_total = metrics[2]
     # tour_preds_total = preds_total[2]
@@ -353,33 +465,50 @@ def train_combine_CV(data_dir, imp_feats, feature_df, last_friday, model_name, n
 
     validation_sub = tour_data.copy()
 
-    validation_sub['signal'] = validation_predictions
+    validation_sub["signal"] = validation_predictions
 
     # live sub
-    train_df.loc[train_df['friday_date'] == last_friday, 'data_type'] = 'live'
+    train_df.loc[train_df["friday_date"] == last_friday, "data_type"] = "live"
 
     live_sub = train_df.query('data_type == "live"').copy()
 
-    live_sub['signal'] = get_predictions(df=live_sub[feature_names],
-                                         num_models=4,
-                                         folder_name=models_save_folder)
+    live_sub["signal"] = get_predictions(
+        df=live_sub[feature_names], num_models=4, folder_name=models_save_folder
+    )
 
     # concat valid and test
     sub = pd.concat([validation_sub, live_sub], ignore_index=True)
 
     # select necessary columns
-    sub = sub[['ticker', 'friday_date', 'data_type', 'signal']]
+    sub = sub[["ticker", "friday_date", "data_type", "signal"]]
 
     # submit
-    submit_signal(sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit, submit_diagnostics, model_name, upload_name=upload_name)
+    submit_signal(
+        sub,
+        napi_credentials["public_id"],
+        napi_credentials["secret_key"],
+        submit,
+        submit_diagnostics,
+        model_name,
+        upload_name=upload_name,
+    )
 
     # submit reverse
     if submit_reverse:
         reverse_sub = sub
-        reverse_sub['signal'] = reverse_sub.groupby('friday_date')['signal'].rank(pct=True, method="first", ascending=False)
+        reverse_sub["signal"] = reverse_sub.groupby("friday_date")["signal"].rank(
+            pct=True, method="first", ascending=False
+        )
         reverse_sub.reset_index(drop=True, inplace=True)
-        submit_signal(reverse_sub, napi_credentials['public_id'], napi_credentials['secret_key'], submit_reverse, submit_diagnostics_reverse, model_name_reverse,
-                      upload_name)
+        submit_signal(
+            reverse_sub,
+            napi_credentials["public_id"],
+            napi_credentials["secret_key"],
+            submit_reverse,
+            submit_diagnostics_reverse,
+            model_name_reverse,
+            upload_name,
+        )
 
     # free memory
     gc.collect()

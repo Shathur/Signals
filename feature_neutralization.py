@@ -1,14 +1,10 @@
 import pandas as pd
 import numpy as np
 
+
 # to neutralize a column in a df by many other columns on a per-era basis
 def neutralize(
-    df,
-    columns,
-    extra_neutralizers=None,
-    proportion=1.0,
-    normalize=True,
-    era_col="era"
+    df, columns, extra_neutralizers=None, proportion=1.0, normalize=True, era_col="era"
 ):
     """
     ::param: df: pd.DataFrame()
@@ -29,7 +25,7 @@ def neutralize(
         if normalize:
             scores2 = []
             for x in scores.T:
-                x = (pd.Series(x).rank(method="first").values - .5) / len(x)
+                x = (pd.Series(x).rank(method="first").values - 0.5) / len(x)
                 scores2.append(x)
             scores = np.array(scores2).T
             extra = df_era[extra_neutralizers].values
@@ -38,12 +34,11 @@ def neutralize(
             exposures = df_era[extra_neutralizers].values
 
         scores -= proportion * exposures.dot(
-            np.linalg.pinv(exposures.astype(np.float32)).dot(scores.astype(np.float32)))
+            np.linalg.pinv(exposures.astype(np.float32)).dot(scores.astype(np.float32))
+        )
 
         scores /= scores.std(ddof=0)
 
         computed.append(scores)
 
-    return pd.DataFrame(np.concatenate(computed),
-                        columns=columns,
-                        index=df.index)
+    return pd.DataFrame(np.concatenate(computed), columns=columns, index=df.index)
