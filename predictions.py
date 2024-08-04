@@ -3,7 +3,7 @@ import numpy as np
 import lightgbm as lgb
 from sklearn.preprocessing import MinMaxScaler
 import pickle
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 import os
 import gc
 import joblib
@@ -367,7 +367,7 @@ def single_predict_per_era(
         model = joblib.load(filename=model_path)
     X_test = df
     preds = predict_in_era_batch(
-        model=model_path, df=X_test, era_idx=era_idx, rank_per_era=rank_average
+        model=model, df=X_test, era_idx=era_idx, rank_per_era=rank_average
     )
     return preds
 
