@@ -120,8 +120,8 @@ def train_val(
             train_preds_total.append(train_preds)
             val_preds_total.append(val_preds)
 
-            train_data[pred_name] = train_preds
-            val_data[pred_name] = val_preds
+            train_data.loc[:, [pred_name]] = train_preds
+            val_data.loc[:, [pred_name]] = val_preds
 
             if visualize:
                 # show prediction distribution, most should be around the center
@@ -146,7 +146,7 @@ def train_val(
             if (tour_df is not None) and (not tour_df.empty):
                 tour_preds = model.predict(tour_df[feature_names])
                 tour_preds_total.append(tour_preds)
-                tour_df[pred_name] = tour_preds
+                tour_df.loc[:, [pred_name]] = tour_preds
                 tour_era_scores = tour_df.groupby(tour_df[date_col]).apply(
                     lambda x: utils.score(x, target_name, pred_name)
                 )
@@ -260,7 +260,7 @@ def train_CV(
 
     validation_sub = tour_data.copy()
 
-    validation_sub["signal"] = validation_predictions
+    validation_sub.loc[:, ["signal"]] = validation_predictions
 
     # live sub
     train_df.loc[train_df["friday_date"] == last_friday, "data_type"] = "live"

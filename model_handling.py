@@ -40,7 +40,7 @@ def run_model(
     fit_params=None,
     save_to_drive=False,
     save_folder=None,
-    legacy_save=True,
+    legacy_save=False,
     cv_count=None,
 ):
     X_train, y_train = train_data

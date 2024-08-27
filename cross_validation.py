@@ -1,4 +1,7 @@
 import pandas as pd
+from warnings import simplefilter
+
+simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 import numpy as np
 
 from sklearn.model_selection._split import _BaseKFold, indexable, _num_samples
